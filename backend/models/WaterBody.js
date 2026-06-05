@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { getStatusFromHealthScore } = require('../utils/healthScore');
 
 const waterBodySchema = new mongoose.Schema({
   name: {
@@ -61,5 +62,29 @@ const waterBodySchema = new mongoose.Schema({
 
 // Create geospatial index for location queries
 waterBodySchema.index({ location: '2dsphere' });
+
+waterBodySchema.pre('save', function (next) {
+  if (this.isNew || this.isModified('healthScore')) {
+    this.status = getStatusFromHealthScore(this.healthScore);
+  }
+  next();
+});
+
+waterBodySchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate();
+  if (!update) return next();
+
+  const incomingHealthScore = update.healthScore ?? update.$set?.healthScore;
+  if (incomingHealthScore != null) {
+    const status = getStatusFromHealthScore(incomingHealthScore);
+    if (update.$set) {
+      update.$set.status = status;
+    } else {
+      update.status = status;
+    }
+  }
+
+  next();
+});
 
 module.exports = mongoose.model('WaterBody', waterBodySchema);

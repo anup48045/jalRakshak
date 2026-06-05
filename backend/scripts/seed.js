@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const WaterBody = require('../models/WaterBody');
+const { getStatusFromHealthScore } = require('../utils/healthScore');
 const path = require('path');
 const xlsx = require('xlsx');
 
@@ -203,7 +204,6 @@ const seedData = async () => {
           category = 'lake';
         }
 
-        let finalStatus = 'moderate';
         let finalHealthScore = 65;
 
         const descLower = description ? description.toLowerCase() : '';
@@ -214,7 +214,6 @@ const seedData = async () => {
           descLower.includes('flora') ||
           (descLower.includes('developed') && descLower.includes('wet') && !descLower.includes('dry'))
         ) {
-          finalStatus = 'healthy';
           finalHealthScore = 80 + Math.floor(Math.random() * 16); // 80 to 95
         } else if (
           descLower.includes('dried') ||
@@ -224,19 +223,16 @@ const seedData = async () => {
           descLower.includes('encroachment') ||
           descLower.includes('encroached')
         ) {
-          finalStatus = 'critical';
           finalHealthScore = 15 + Math.floor(Math.random() * 30); // 15 to 44
         } else {
-          finalStatus = 'moderate';
           finalHealthScore = 50 + Math.floor(Math.random() * 25); // 50 to 74
         }
 
-        if (status && ['healthy', 'moderate', 'critical'].includes(status)) {
-          finalStatus = status;
-        }
         if (healthScore != null && !Number.isNaN(healthScore) && healthScore > 0) {
           finalHealthScore = healthScore;
         }
+
+        const finalStatus = getStatusFromHealthScore(finalHealthScore);
 
         waterBodies.push({
           name,

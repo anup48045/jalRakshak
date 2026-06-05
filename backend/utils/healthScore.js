@@ -53,6 +53,12 @@ function calculateHealthScore(qualityData) {
   return Math.round(healthScore);
 }
 
+function getStatusFromHealthScore(healthScore = 0) {
+  if (healthScore >= 80) return 'healthy';
+  if (healthScore < 50) return 'critical';
+  return 'moderate';
+}
+
 // Check alert thresholds
 function checkAlertThresholds(waterBody, qualityData) {
   const alerts = [];
@@ -110,5 +116,6 @@ function checkAlertThresholds(waterBody, qualityData) {
 
 module.exports = {
   calculateHealthScore,
+  getStatusFromHealthScore,
   checkAlertThresholds
 };
