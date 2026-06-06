@@ -9,7 +9,7 @@ const Reports = () => {
   const [selectedWaterBodyId, setSelectedWaterBodyId] = useState(null)
 
   return (
-    <div className="space-y-6 flex">
+    <div className="space-y-6 flex md:flex-row flex-col">
       <WaterBodyList onWaterBodySelect={setSelectedWaterBodyId}/>
       <BarGraph waterBodyId={selectedWaterBodyId} />
       {/* <LineGraph /> */}

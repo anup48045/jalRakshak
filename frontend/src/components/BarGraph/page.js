@@ -119,7 +119,7 @@ export default function BarGraph({ waterBodyId }) {
   }
 
   return (
-    <div className="w-full h-[350px] bg-white rounded-lg shadow p-4">
+    <div className="w-full h-[500px] bg-white rounded-lg">
       <h2 className="text-xl font-semibold mb-4">
         {waterBodyName} Health Score Trend
       </h2>
@@ -128,7 +128,10 @@ export default function BarGraph({ waterBodyId }) {
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
-          <YAxis domain={[0, 100]} label={{ value: 'Health Score', angle: -90, position: 'insideLeft' }} />
+          <YAxis 
+          domain={[0, 100]}
+          ticks={Array.from({ length: 11 }, (_, i) => i * 10)} 
+          label={{ value: 'Health Score', angle: -90, position: 'insideLeft' }} />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="healthScore" radius={[8, 8, 0, 0]}>
             {data.map((entry, index) => (
