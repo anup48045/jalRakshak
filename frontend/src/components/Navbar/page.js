@@ -31,7 +31,6 @@ const Navbar = () => {
             <Link href="/" className="hover:text-slate-800">Home</Link>
             <Link href="/about" className="hover:text-slate-800">About</Link>
             <Link href="/geomap" className="hover:text-slate-800">Water Bodies Geo Map</Link>
-            <Link href="/water-bodies" className="hover:text-slate-800">Water Bodies</Link>
             <Link href="/reports" className="hover:text-slate-800">Reports</Link>
             <Link href="/contact" className="hover:text-slate-800">Contact</Link>
           </nav>

@@ -14,8 +14,7 @@ const Footer = () => {
           <h5 className="text-white font-medium">Quick Links</h5>
           <ul className="mt-3 space-y-2 text-sm text-slate-300">
             <li><Link href="/" className="hover:underline">Home</Link></li>
-            <li><Link href="/realtime" className="hover:underline">Real-Time Data</Link></li>
-            <li><Link href="/water-bodies" className="hover:underline">Water Bodies</Link></li>
+            <li><Link href="/geomap" className="hover:underline">Water Bodies Geo Map</Link></li>
             <li><Link href="/reports" className="hover:underline">Reports</Link></li>
           </ul>
         </div>
