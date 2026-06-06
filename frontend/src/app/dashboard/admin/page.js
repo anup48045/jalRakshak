@@ -8,55 +8,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import toast from 'react-hot-toast'
 
-export default function DashboardPage() {
+export default function AdminDashboard() {
   const router = useRouter()
   const { user, logout, hasRole } = useAuthStore()
   const [stats, setStats] = useState(null)
   const [recentAlerts, setRecentAlerts] = useState([])
   const [recentSurveys, setRecentSurveys] = useState([])
+  const [recentComplaints, setRecentComplaints] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login')
+    if (!user || !hasRole(['admin'])) {
+      router.push('/dashboard')
       return
     }
-    
-    // Redirect to role-specific dashboard
-    if (user.role === 'admin') {
-      router.push('/dashboard/admin')
-      return
-    } else if (user.role === 'officer') {
-      router.push('/dashboard/officer')
-      return
-    } else if (user.role === 'user') {
-      router.push('/dashboard/citizen')
-      return
-    }
-    
     fetchDashboardData()
-  }, [user, router])
+  }, [user, router, hasRole])
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, alertsRes, surveysRes] = await Promise.all([
+      const [statsRes, alertsRes, surveysRes, complaintsRes] = await Promise.all([
         api.get('/dashboard/stats'),
         api.get('/dashboard/recent-alerts?limit=5'),
-        api.get('/dashboard/recent-surveys?limit=5')
+        api.get('/dashboard/recent-surveys?limit=5'),
+        api.get('/citizen-reports?limit=5')
       ])
       setStats(statsRes.data.stats)
       setRecentAlerts(alertsRes.data.alerts)
       setRecentSurveys(surveysRes.data.surveys)
+      setRecentComplaints(complaintsRes.data.reports || [])
     } catch (error) {
       toast.error('Failed to load dashboard data')
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleLogout = () => {
-    logout()
-    router.push('/login')
   }
 
   if (loading) {
@@ -74,14 +59,13 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">JalRakshak Dashboard</h1>
-              <p className="text-sm text-gray-600">Water Body Monitoring System - Delhi</p>
+              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="text-sm text-gray-600">Government Organization - Full System Access</p>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
-                Welcome, {user?.name} ({user?.role})
+                Welcome, {user?.name} (Admin)
               </span>
-              {/* <Button onClick={handleLogout} variant="outline">Logout</Button> */}
             </div>
           </div>
         </div>
@@ -130,52 +114,95 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/map')}>
+        {/* Admin Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/water-bodies')}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                GIS Map View
+                Manage Water Bodies
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">View all water bodies on interactive map</p>
+              <p className="text-sm text-gray-600">Add, update, or delete water bodies</p>
             </CardContent>
           </Card>
 
-          {hasRole(['admin', 'officer']) && (
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/surveys/new')}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  New Survey
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600">Conduct a new water body survey</p>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/alerts')}>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/users/manage')}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                View Alerts
+                Manage Users
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">View and manage active alerts</p>
+              <p className="text-sm text-gray-600">Create and manage Survey Officer accounts</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/complaints')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Manage Complaints
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600">View and manage citizen complaints</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/reports')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                View Reports
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600">Access analytics and reports</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Recent Complaints */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Recent Citizen Complaints</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentComplaints.length === 0 ? (
+              <p className="text-sm text-gray-500">No recent complaints</p>
+            ) : (
+              <div className="space-y-3">
+                {recentComplaints.map((complaint) => (
+                  <div key={complaint._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900">{complaint.title || 'Untitled Complaint'}</p>
+                      <p className="text-sm text-gray-600">{complaint.description?.substring(0, 50)}...</p>
+                      <p className="text-xs text-gray-500">By: {complaint.isAnonymous ? 'Anonymous' : complaint.reporterName || 'Unknown'}</p>
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      complaint.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                      complaint.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {complaint.status || 'pending'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent Alerts */}
         <Card className="mb-8">

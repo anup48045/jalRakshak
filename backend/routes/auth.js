@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
       name,
       email,
       password,
-      role: role || 'citizen',
+      role: role || 'user',
       phone,
       district
     });
