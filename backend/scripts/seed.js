@@ -132,8 +132,6 @@ const seedData = async () => {
           const lon = parseDMS(lonMatch[1], lonMatch[2], lonMatch[3], lonMatch[4]);
           return [lat, lon];
         }
-        // s = s.replace(/°/g, ' ')
-        // s = s.replace(/[,\n\r]/g, ' ');
 
         // Try decimal numbers first
         const decimals = s.match(/-?\d+\.\d+/g);
@@ -142,17 +140,6 @@ const seedData = async () => {
           const lon = parseFloat(decimals[1]);
           return [lat, lon];
         }
-
-        // Try integers (could be DMS without decimals)
-        // const ints = s.match(/-?\d+/g);
-        // DMS pattern with N/S and E/W
-
-        // Fallback: if we have at least two ints, take first two as lat lon
-        // if (ints && ints.length >= 2) {
-        //   const lat = parseFloat(ints[0]);
-        //   const lon = parseFloat(ints[1]);
-        //   return [lat, lon];
-        // }
 
         return [null, null];
       };

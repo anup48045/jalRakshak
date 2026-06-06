@@ -6,6 +6,28 @@ const waterQualitySchema = new mongoose.Schema({
     ref: 'WaterBody',
     required: true
   },
+  name: {
+    type: String,
+    required: [true, 'Please provide a name'],
+    trim: true
+  },
+  year: {
+    type: Number,
+    required: true,
+    min: 2000,
+    max: 2100,
+  },
+  status: {
+    type: String,
+    enum: ['healthy', 'moderate', 'critical'],
+    default: 'moderate'
+  },
+  healthScore: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
   do: {
     type: Number,
     required: true,

@@ -13,6 +13,19 @@ function calculateHealthScore(qualityData) {
   } else if (qualityData.do < 6) {
     penalty += 5;
   }
+  // Turbidity
+if (qualityData.turbidity > 50) {
+  penalty += 10;
+} else if (qualityData.turbidity > 20) {
+  penalty += 5;
+}
+
+// Conductivity
+if (qualityData.conductivity > 1500) {
+  penalty += 10;
+} else if (qualityData.conductivity > 1000) {
+  penalty += 5;
+}
 
   // pH Penalty
   // Optimal: 6.5-8.5

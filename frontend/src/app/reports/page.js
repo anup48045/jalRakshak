@@ -1,18 +1,18 @@
 "use client";
-import React from 'react'
-import dynamic from 'next/dynamic'
-import LineGraph from '@/components/LineGraph/page'
+import React, { useState } from 'react'
 import BarGraph from '@/components/BarGraph/page'
+import WaterBodyList from '@/components/WaterBodyList/page'
 
-// const HeatMap = dynamic(() => import('@/components/HeatMap/page'), {
-//   ssr: false,
-// })
+
 
 const Reports = () => {
+  const [selectedWaterBodyId, setSelectedWaterBodyId] = useState(null)
+
   return (
-    <div>
-      <LineGraph />
-      <BarGraph />
+    <div className="space-y-6 flex">
+      <WaterBodyList onWaterBodySelect={setSelectedWaterBodyId}/>
+      <BarGraph waterBodyId={selectedWaterBodyId} />
+      {/* <LineGraph /> */}
       {/* <HeatMap /> */}
     </div>
   )
