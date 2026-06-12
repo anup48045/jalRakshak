@@ -60,13 +60,9 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
+          <div className="mx-auto rounded-full flex items-center justify-center mb-4">            
+            <img src="/logo.png" width={550} height={570} alt="" />
           </div>
-          <CardTitle className="text-2xl">Citizen Registration</CardTitle>
-          <CardDescription>Join JalRakshak - Report Pollution & Monitor Water Bodies</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -144,18 +140,6 @@ export default function RegisterPage() {
                 Sign In
               </button>
             </p>
-          </div>
-
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-xs text-blue-800">
-              <strong>Benefits of Registration:</strong>
-            </p>
-            <ul className="text-xs text-blue-700 mt-2 space-y-1">
-              <li>• Submit pollution complaints</li>
-              <li>• Track complaint status</li>
-              <li>• Access AI water analysis</li>
-              <li>• View water body Geomap</li>
-            </ul>
           </div>
         </CardContent>
       </Card>

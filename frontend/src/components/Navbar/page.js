@@ -17,27 +17,27 @@ const Navbar = () => {
   }
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="bg-blue-100 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-3">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">JR</div>
-              <span className="font-semibold text-lg text-slate-700">JalRakshak</span>
+               <img src="/logo.png" alt="" width={180} height={200}/>
             </Link>
           </div>
 
           <nav className="hidden md:flex items-center space-x-6 text-slate-600">
-            <Link href="/" className="hover:text-slate-800">Home</Link>
-            <Link href="/about" className="hover:text-slate-800">About</Link>
-            <Link href="/geomap" className="hover:text-slate-800">Water Bodies Geo Map</Link>
-            <Link href="/ai-analysis" className="hover:text-slate-800">AI Analysis</Link>
-            <Link href="/reports" className="hover:text-slate-800">Reports</Link>
-            <Link href="/contact" className="hover:text-slate-800">Contact</Link>
+            <Link href="/" className="hover:text-slate-800 font-bold">Home</Link>
+            <Link href="/about" className="hover:text-slate-800 font-bold">About</Link>
+            <Link href="/geomap" className="hover:text-slate-800 font-bold">Water Bodies Geo Map</Link>
+            <Link href="/ai-analysis" className="hover:text-slate-800 font-bold">AI Analysis</Link>
+            <Link href="/reports" className="hover:text-slate-800 font-bold">Reports</Link>
+            <Link href="/contact" className="hover:text-slate-800 font-bold">Contact</Link>
           </nav>
           { user ? 
           <div className="flex items-center space-x-3">
-              <Button onClick={handleLogout} variant="outline">Logout</Button>          </div>
+              <Button onClick={handleLogout} variant="outline">Logout</Button>          
+            </div>
 
           : (
             <div className="flex items-center space-x-3">

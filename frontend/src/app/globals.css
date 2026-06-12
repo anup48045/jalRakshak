@@ -63,3 +63,9 @@
   background: transparent !important;
   border: none !important;
 }
+.home{
+  background-image: url("/images/bg3.jpeg");
+ background-size: cover;
+ background-position: center;
+ background-repeat: no-repeat;
+}

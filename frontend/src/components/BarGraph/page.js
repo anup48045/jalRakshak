@@ -133,7 +133,7 @@ export default function BarGraph({ waterBodyId }) {
           ticks={Array.from({ length: 11 }, (_, i) => i * 10)} 
           label={{ value: 'Health Score', angle: -90, position: 'insideLeft' }} />
           <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="healthScore" radius={[8, 8, 0, 0]}>
+          <Bar dataKey="healthScore" radius={[8, 8, 0, 0]} barSize={50}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getBarColor(entry.healthScore)} />
             ))}

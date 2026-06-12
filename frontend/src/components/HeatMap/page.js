@@ -62,7 +62,7 @@ export default function HeatMap() {
   return (
     <div
       ref={mapRef}
-      style={{ width: "100%", height: "600px" }}
+      style={{ width: "98%", height: "450px", margin:"10px"}}
       className="rounded-lg overflow-hidden "
     />
   );
