@@ -6,8 +6,11 @@ import os
 from dotenv import load_dotenv
 import cv2
 import numpy as np
+import pandas as pd
 from PIL import Image
 import io
+import pickle
+import joblib
 
 load_dotenv()
 
@@ -34,18 +37,44 @@ class AnalysisResponse(BaseModel):
     overall_pollution_level: str
     image_url: Optional[str] = None
 
-# Initialize YOLO model (placeholder - would load actual model in production)
-model = None
+class WaterQualityParams(BaseModel):
+    temp: float
+    do: float
+    ph: float
+    conductivity: float
+    bod: float
+    nitrate: float
+    fecalColiform: float
+    totalColiform: float
+
+class WQIResponse(BaseModel):
+    success: bool
+    wqi: float
+    healthScore: float
+    status: str
+    classification: int
+
+# Initialize models
+detection_model = None
+wqi_model = None
 
 def load_model():
-    """Load the YOLO model for pollution detection"""
-    global model
+    """Load the YOLO model for pollution detection and WQI model"""
+    global detection_model, wqi_model
     try:
+        # Load WQI prediction model
+        model_path = os.path.join(os.path.dirname(__file__), 'wqi_model.pkl')
+        if os.path.exists(model_path):
+            wqi_model = joblib.load(model_path)
+            print("WQI model loaded successfully")
+        else:
+            print(f"WQI model not found at {model_path}")
+        
         # In production, load actual YOLOv11 model
-        # model = YOLO('best.pt')
-        print("Model loaded successfully")
+        # detection_model = YOLO('best.pt')
+        print("Models loaded successfully")
     except Exception as e:
-        print(f"Error loading model: {e}")
+        print(f"Error loading models: {e}")
 
 @app.on_event("startup")
 async def startup_event():
@@ -165,8 +194,71 @@ async def batch_analyze(files: List[UploadFile] = File(...)):
                 "filename": file.filename,
                 "error": str(e)
             })
-    
+
     return {"success": True, "results": results}
+
+# ['Temp', 'DO', 'PH', 'Conductivity', 'BOD', 'NI', 'Fec_col', 'Tot_col']
+
+@app.post("/calculate-wqi", response_model=WQIResponse)
+async def calculate_wqi(params: WaterQualityParams):
+    """
+    Calculate Water Quality Index using the Random Forest model
+    """
+    print("Received params:", params)
+    try:
+        if wqi_model is None:
+            raise HTTPException(status_code=500, detail="WQI model not loaded")
+
+        # Prepare features for prediction
+        features = pd.DataFrame([{
+            'Temp': params.temp,
+            'DO': params.do,
+            'PH': params.ph,
+            'Conductivity': params.conductivity,
+            'BOD': params.bod,
+            'NI': params.nitrate,
+            'Fec_col': params.fecalColiform,
+            'Tot_col': params.totalColiform
+        }])
+
+        # features = [[
+        #     params.temp,
+        #     params.do,
+        #     params.ph,
+        #     params.conductivity,
+        #     params.bod,
+        #     params.nitrate,
+        #     params.fecalColiform,
+        #     params.totalColiform
+        # ]]
+
+        # Predict WQI using the model
+        wqi_prediction = wqi_model.predict(features)[0]
+        if wqi_prediction < 25:
+            status = "excellent"
+            classification = 3
+        elif wqi_prediction <= 50:
+            status = "good"
+            classification = 2
+        elif wqi_prediction <= 75:
+            status = "poor"
+            classification = 1
+        else:
+            status = "critical"
+            classification = 0
+
+        # Optional health score (0-100 scale)
+        health_score = max(0, min(100, 100 - wqi_prediction))
+
+        return WQIResponse(
+            success=True,
+            wqi=round(wqi_prediction, 2),
+            healthScore=round(health_score, 2),
+            status=status,
+            classification=classification
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"WQI calculation failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

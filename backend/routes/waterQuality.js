@@ -4,8 +4,45 @@ const WaterBody = require('../models/WaterBody');
 const Alert = require('../models/Alert');
 const { protect, authorize } = require('../middleware/auth');
 const { calculateHealthScore, getStatusFromHealthScore, checkAlertThresholds, mergeThresholdAlerts } = require('../utils/healthScore');
+const axios = require('axios');
 
 const router = express.Router();
+
+// AI Module configuration
+const AI_MODULE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
+// Function to call AI module for WQI calculation
+async function calculateWQIWithAI(waterQualityData) {
+  try {
+    const response = await axios.post(`${AI_MODULE_URL}/calculate-wqi`, {
+      do: waterQualityData.do,
+      ph: waterQualityData.ph,
+      bod: waterQualityData.bod,
+      nitrate: waterQualityData.nitrate,
+      fecalColiform: waterQualityData.fecalColiform
+    }, {
+      timeout: 5000 // 5 second timeout
+    });
+
+    if (response.data.success) {
+      return {
+        healthScore: response.data.healthScore,
+        wqi: response.data.wqi,
+        status: response.data.status
+      };
+    }
+    throw new Error('AI module returned unsuccessful response');
+  } catch (error) {
+    console.error('AI module error, falling back to local calculation:', error.message);
+    // Fallback to local calculation if AI module fails
+    const healthScore = calculateHealthScore(waterQualityData);
+    return {
+      healthScore,
+      wqi: healthScore,
+      status: getStatusFromHealthScore(healthScore)
+    };
+  }
+}
 
 // @route   GET /api/waterquality
 // @desc    Get all water quality records
@@ -73,15 +110,15 @@ router.post('/', protect, authorize('admin', 'officer'), async (req, res) => {
       testedBy: req.user._id
     };
 
-    // Calculate health score
-    const healthScore = calculateHealthScore(qualityData);
-    
-    // Update water body health score and status
-    const status = getStatusFromHealthScore(healthScore);
+    // Calculate health score using AI module
+    const wqiResult = await calculateWQIWithAI(qualityData);
+    const healthScore = wqiResult.healthScore;
+    const status = wqiResult.status;
+
     qualityData.healthScore = healthScore;
     qualityData.status = status;
     const record = await WaterQuality.create(qualityData);
-    
+
     await WaterBody.findByIdAndUpdate(
       record.waterBodyId,
       {
@@ -106,6 +143,8 @@ router.post('/', protect, authorize('admin', 'officer'), async (req, res) => {
       success: true,
       record,
       healthScore,
+      wqi: wqiResult.wqi,
+      status,
       alertsGenerated
     });
   } catch (error) {

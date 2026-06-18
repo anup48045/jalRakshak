@@ -31,6 +31,7 @@ const Navbar = () => {
             <Link href="/about" className="hover:text-slate-800 font-bold">About</Link>
             <Link href="/geomap" className="hover:text-slate-800 font-bold">Water Bodies Geo Map</Link>
             <Link href="/ai-analysis" className="hover:text-slate-800 font-bold">AI Analysis</Link>
+            <Link href="/health-calculator" className="hover:text-slate-800 font-bold">WQI Calculator</Link>
             <Link href="/complaints/new" className="hover:text-slate-800 font-bold">Report Pollution</Link>
             <Link href="/contact" className="hover:text-slate-800 font-bold">Contact</Link>
           </nav>

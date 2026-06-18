@@ -22,25 +22,119 @@ export default function OfficerDashboard() {
       return
     }
     fetchDashboardData()
-  }, [user, router, hasRole])
+  }, [user, router, hasRole, user?._id])
 
+  // const fetchDashboardData = async () => {
+  //   try {
+  //     if (!user?._id) {
+  //     setLoading(false);
+  //     return;
+  //   }
+  //     const [statsRes, surveysRes, alertsRes] = await Promise.all([
+  //       api.get('/dashboard/stats').catch(err => {
+  //         console.error('Stats API error:', err)
+  //         return { data: { stats: null } }
+  //       }),
+  //       api.get('/surveys?officerId=' + user._id + '&limit=5').catch(err => {
+  //         console.error('Surveys API error:', err)
+  //         return { data: { surveys: [] } }
+  //       }),
+  //       api.get('/dashboard/recent-alerts?limit=5').catch(err => {
+  //         console.error('Alerts API error:', err)
+  //         return { data: { alerts: [] } }
+  //       })
+  //     ])
+  //     setStats(statsRes.data.stats)
+  //     setMySurveys(surveysRes.data.surveys || [])
+  //     setRecentAlerts(alertsRes.data.alerts || [])
+  //   } catch (error) {
+  //     console.error('Dashboard data loading error:', error)
+  //     toast.error('Failed to load dashboard data: ' + (error.response?.data?.message || error.message))
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
   const fetchDashboardData = async () => {
-    try {
-      const [statsRes, surveysRes, alertsRes] = await Promise.all([
-        api.get('/dashboard/stats'),
-        api.get('/surveys?officerId=' + user._id + '&limit=5'),
-        api.get('/dashboard/recent-alerts?limit=5')
-      ])
-      setStats(statsRes.data.stats)
-      setMySurveys(surveysRes.data.surveys || [])
-      setRecentAlerts(alertsRes.data.alerts)
-    } catch (error) {
-      toast.error('Failed to load dashboard data')
-    } finally {
-      setLoading(false)
+  try {
+    console.log('User ID:', user?._id);
+    if (!user?._id) {
+      setLoading(false);
+      return;
     }
-  }
 
+    const statsPromise = api.get('/dashboard/stats')
+      .catch(err => {
+        console.error('Stats API error:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message
+        });
+
+        return {
+          data: {
+            stats: null
+          }
+        };
+      });
+
+    const surveysPromise = api.get(
+      `/surveys?officerId=${user._id}&limit=5`
+    ).catch(err => {
+      console.error('Surveys API error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+
+      return {
+        data: {
+          surveys: []
+        }
+      };
+    });
+
+    const alertsPromise = api.get(
+      '/dashboard/recent-alerts?limit=5'
+    ).catch(err => {
+      console.error('Alerts API error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+
+      return {
+        data: {
+          alerts: []
+        }
+      };
+    });
+
+    const [statsRes, surveysRes, alertsRes] = await Promise.all([
+      statsPromise,
+      surveysPromise,
+      alertsPromise
+    ]);
+
+    console.log('Stats Response:', statsRes);
+    console.log('Surveys Response:', surveysRes);
+    console.log('Alerts Response:', alertsRes);
+
+    setStats(statsRes?.data?.stats ?? null);
+    setMySurveys(surveysRes?.data?.surveys ?? []);
+    setRecentAlerts(alertsRes?.data?.alerts ?? []);
+
+  } catch (error) {
+    console.error('Dashboard data loading error:', error);
+
+    toast.error(
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to load dashboard data'
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
