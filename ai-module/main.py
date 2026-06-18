@@ -221,17 +221,6 @@ async def calculate_wqi(params: WaterQualityParams):
             'Tot_col': params.totalColiform
         }])
 
-        # features = [[
-        #     params.temp,
-        #     params.do,
-        #     params.ph,
-        #     params.conductivity,
-        #     params.bod,
-        #     params.nitrate,
-        #     params.fecalColiform,
-        #     params.totalColiform
-        # ]]
-
         # Predict WQI using the model
         wqi_prediction = wqi_model.predict(features)[0]
         if wqi_prediction < 25:

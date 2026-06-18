@@ -20,8 +20,8 @@ const Navbar = () => {
     <header className="bg-blue-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center space-x-3">
-            <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center ml-0">
+            <Link href="/" className="flex items-center">
                <img src="/logo.png" alt="" width={180} height={200}/>
             </Link>
           </div>
@@ -36,7 +36,7 @@ const Navbar = () => {
             <Link href="/contact" className="hover:text-slate-800 font-bold">Contact</Link>
           </nav>
           { user ? 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mr-0">
               <Button onClick={handleLogout} variant="outline">Logout</Button>
               <Button onClick={()=>router.push('/dashboard')}>Dashboard</Button>          
             </div>

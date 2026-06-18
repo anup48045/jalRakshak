@@ -24,17 +24,50 @@ export default function HealthCalculatorPage() {
     setLoading(true);
 
     try {
-      const payload = {
-        temp: parseFloat(formData.temp),
-        do: parseFloat(formData.do),
-        ph: parseFloat(formData.ph),
-        conductivity: parseFloat(formData.conductivity),
-        bod: parseFloat(formData.bod),
-        nitrate: parseFloat(formData.nitrate),
-        fecalColiform: parseFloat(formData.fecalColiform),
-        totalColiform: parseFloat(formData.totalColiform),
-      };
-      console.log(payload);
+        const payload = {
+              temp: formData.temp
+                ? parseFloat(formData.temp)
+                : 26.253644,
+
+              do: formData.do
+                ? parseFloat(formData.do)
+                : 6.398811,
+
+              ph: formData.ph
+                ? parseFloat(formData.ph)
+                : 7.229067,
+
+              conductivity: formData.conductivity
+                ? parseFloat(formData.conductivity)
+                : 1679.051028,
+
+              bod: formData.bod
+                ? parseFloat(formData.bod)
+                : 6.503025,
+
+              nitrate: formData.nitrate
+                ? parseFloat(formData.nitrate)
+                : 1.407751,
+
+              fecalColiform: formData.fecalColiform
+                ? parseFloat(formData.fecalColiform)
+                : 1200,
+
+              totalColiform: formData.totalColiform
+                ? parseFloat(formData.totalColiform)
+                : 2500,
+            };
+      // const payload = {
+      //   temp: parseFloat(formData.temp),
+      //   do: parseFloat(formData.do),
+      //   ph: parseFloat(formData.ph),
+      //   conductivity: parseFloat(formData.conductivity),
+      //   bod: parseFloat(formData.bod),
+      //   nitrate: parseFloat(formData.nitrate),
+      //   fecalColiform: parseFloat(formData.fecalColiform),
+      //   totalColiform: parseFloat(formData.totalColiform),
+      // };
+      // console.log(payload);
 
       const response = await fetch("http://localhost:8000/calculate-wqi", {
         method: "POST",
@@ -167,7 +200,6 @@ export default function HealthCalculatorPage() {
                   <input
                     type="number"
                     step="0.1"
-                    required
                     value={formData.conductivity}
                     onChange={(e) =>
                       setFormData({ ...formData, conductivity: e.target.value })
@@ -201,7 +233,6 @@ export default function HealthCalculatorPage() {
                   <input
                     type="number"
                     step="0.1"
-                    required
                     value={formData.nitrate}
                     onChange={(e) =>
                       setFormData({ ...formData, nitrate: e.target.value })
@@ -218,7 +249,6 @@ export default function HealthCalculatorPage() {
                   <input
                     type="number"
                     step="0.1"
-                    required
                     value={formData.fecalColiform}
                     onChange={(e) =>
                       setFormData({ ...formData, fecalColiform: e.target.value })
@@ -321,6 +351,22 @@ export default function HealthCalculatorPage() {
                       </div>
                     </div>
                   </div>
+                  <div className="max-w-md mx-auto bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                    <h4 className="font-semibold text-blue-800 mb-2">
+                      Recommended Input Ranges
+                    </h4>
+
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li><strong>Temperature:</strong> 0 - 50 °C</li>
+                      <li><strong>Dissolved Oxygen (DO):</strong> 0 - 14 mg/L</li>
+                      <li><strong>pH:</strong> 0 - 14</li>
+                      <li><strong>Conductivity:</strong> 0 - 5000 µS/cm</li>
+                      <li><strong>BOD:</strong> 0 - 100 mg/L</li>
+                      <li><strong>Nitrate:</strong> 0 - 100 mg/L</li>
+                      <li><strong>Fecal Coliform:</strong> 0 - 10000 MPN/100mL</li>
+                      <li><strong>Total Coliform:</strong> 0 - 100000 MPN/100mL</li>
+                    </ul>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -339,9 +385,29 @@ export default function HealthCalculatorPage() {
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-500">
-                    Enter water quality parameters and click "Calculate Health Score" to see results
-                  </p>
+                    <p className="text-gray-500 mb-4">
+                      Enter water quality parameters and click
+                      <span className="font-semibold">
+                        {" "}Calculate Health Score
+                      </span>
+                      {" "}to see results.
+                    </p>
+                    <div className="max-w-md mx-auto bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                    <h4 className="font-semibold text-blue-800 mb-2">
+                      Recommended Input Ranges
+                    </h4>
+
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li><strong>Temperature:</strong> 0 - 50 °C</li>
+                      <li><strong>Dissolved Oxygen (DO):</strong> 0 - 14 mg/L</li>
+                      <li><strong>pH:</strong> 0 - 14</li>
+                      <li><strong>Conductivity:</strong> 0 - 5000 µS/cm</li>
+                      <li><strong>BOD:</strong> 0 - 100 mg/L</li>
+                      <li><strong>Nitrate:</strong> 0 - 100 mg/L</li>
+                      <li><strong>Fecal Coliform:</strong> 0 - 10000 MPN/100mL</li>
+                      <li><strong>Total Coliform:</strong> 0 - 100000 MPN/100mL</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </CardContent>

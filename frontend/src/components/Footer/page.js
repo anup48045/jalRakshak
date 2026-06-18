@@ -17,6 +17,7 @@ const Footer = () => {
             <li><Link href="/geomap" className="hover:underline">Water Bodies Geo Map</Link></li>
             <li><Link href="/ai-analysis" className="hover:underline">AI Analysis</Link></li>
             <li><Link href="/complaints/new" className="hover:underline">Report Pollution</Link></li>
+            <li><Link href="/health-calculator" className="hover:underline">WQI Calculator</Link></li>
           </ul>
         </div>
 
