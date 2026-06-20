@@ -2,8 +2,40 @@ const express = require('express');
 const Survey = require('../models/Survey');
 const WaterBody = require('../models/WaterBody');
 const { protect, authorize } = require('../middleware/auth');
+const axios = require('axios');
 
 const router = express.Router();
+
+// AI Module configuration
+const AI_MODULE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
+// Function to call AI module for WQI calculation
+async function calculateWQIWithAI(waterQualityData) {
+  try {
+    const response = await axios.post(`${AI_MODULE_URL}/calculate-wqi`, {
+      temp: waterQualityData.temp,
+      do: waterQualityData.do,
+      ph: waterQualityData.ph,
+      bod: waterQualityData.bod,
+      totalColiform: waterQualityData.totalColiform
+    }, {
+      timeout: 5000 // 5 second timeout
+    });
+
+    if (response.data.success) {
+      return {
+        healthScore: response.data.healthScore,
+        wqi: response.data.wqi,
+        status: response.data.status,
+        classification: response.data.classification
+      };
+    }
+    throw new Error('AI module returned unsuccessful response');
+  } catch (error) {
+    console.error('AI module error:', error.message);
+    throw error;
+  }
+}
 
 // @route   GET /api/surveys
 // @desc    Get all surveys
@@ -72,6 +104,27 @@ router.post('/', protect, authorize('admin', 'officer'), async (req, res) => {
       officerId: req.user._id,
       officerName: req.user.name
     };
+
+    // Calculate WQI if water quality data is provided
+    if (surveyData.waterQualityData) {
+      try {
+        const wqiResults = await calculateWQIWithAI(surveyData.waterQualityData);
+        surveyData.wqiResults = wqiResults;
+        
+        // Update water body health score and status
+        await WaterBody.findByIdAndUpdate(
+          surveyData.waterBodyId,
+          {
+            healthScore: wqiResults.healthScore,
+            status: wqiResults.status,
+            lastQualityCheck: new Date()
+          }
+        );
+      } catch (error) {
+        console.error('WQI calculation failed, creating survey without WQI:', error.message);
+        // Continue without WQI if AI module fails
+      }
+    }
 
     const survey = await Survey.create(surveyData);
 

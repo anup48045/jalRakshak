@@ -20,7 +20,7 @@ A centralized digital platform that enables government officials to monitor, sur
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd bootcamp
+cd jalRakshak
 
 # Install all dependencies
 npm run install:all
@@ -54,13 +54,15 @@ cp .env.example .env
 ```bash
 cd backend
 node scripts/seed.js
+node scipts/seedWQ.js
+node scripts/seedAlert.js
 ```
 
 This will create:
 - 1 Admin user
 - 2 Field officers
 - 1 Government official
-- 10 Sample water bodies in Delhi
+- Sample water bodies in Delhi
 
 ### Run Development Servers
 

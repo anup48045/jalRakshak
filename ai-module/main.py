@@ -41,10 +41,7 @@ class WaterQualityParams(BaseModel):
     temp: float
     do: float
     ph: float
-    conductivity: float
     bod: float
-    nitrate: float
-    fecalColiform: float
     totalColiform: float
 
 class WQIResponse(BaseModel):
@@ -63,7 +60,7 @@ def load_model():
     global detection_model, wqi_model
     try:
         # Load WQI prediction model
-        model_path = os.path.join(os.path.dirname(__file__), 'wqi_model.pkl')
+        model_path = os.path.join(os.path.dirname(__file__), 'wqi_model1.pkl')
         if os.path.exists(model_path):
             wqi_model = joblib.load(model_path)
             print("WQI model loaded successfully")
@@ -214,10 +211,7 @@ async def calculate_wqi(params: WaterQualityParams):
             'Temp': params.temp,
             'DO': params.do,
             'PH': params.ph,
-            'Conductivity': params.conductivity,
             'BOD': params.bod,
-            'NI': params.nitrate,
-            'Fec_col': params.fecalColiform,
             'Tot_col': params.totalColiform
         }])
 

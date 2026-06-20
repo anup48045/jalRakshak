@@ -14,6 +14,7 @@ export default function WaterQualityForm() {
   const [loading, setLoading] = useState(false);
   const [waterBodies, setWaterBodies] = useState([]);
   const [fetchingWaterBodies, setFetchingWaterBodies] = useState(true);
+  const [qualityData, setQualityData] = useState([]);
   const [formData, setFormData] = useState({
     waterBodyId: "",
     name: "",
@@ -36,7 +37,18 @@ export default function WaterQualityForm() {
       return;
     }
     fetchWaterBodies();
+    fetchQualityData();
   }, [user, hasRole, router]);
+
+  const fetchQualityData = async () => {
+    try {
+      const res = await api.get("/waterquality");
+      setQualityData(res.data.records || []);
+    } catch (error) {
+      console.error("Failed to fetch water quality data:", error);
+      toast.error("Failed to load water quality data");
+    }
+  };
 
   const fetchWaterBodies = async () => {
     try {
@@ -48,7 +60,35 @@ export default function WaterQualityForm() {
       setFetchingWaterBodies(false);
     }
   };
+  const handleWaterBodyChange = (waterBodyId) => {
+  console.log("Received waterBodyId (in handleWaterBodyChange):",waterBodyId)
+  console.log("Fetched QualityData:",qualityData)
+  const currentYear = new Date().getFullYear();
 
+  const quality = qualityData.find(
+    q =>
+      q.waterBodyId._id === waterBodyId &&
+      q.year === currentYear
+  );
+
+  if (quality) {
+    setFormData({
+      waterBodyId,
+      name: quality.name || "",
+      year: quality.year,
+      do: quality.do,
+      ph: quality.ph,
+      bod: quality.bod,
+      nitrate: quality.nitrate,
+      fecalColiform: quality.fecalColiform,
+      totalColiform: quality.totalColiform,
+      temperature: quality.temperature,
+      turbidity: quality.turbidity,
+      conductivity: quality.conductivity,
+      labName: quality.labName || "",
+    });
+  }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -108,7 +148,7 @@ export default function WaterQualityForm() {
                     required
                     value={formData.waterBodyId}
                     onChange={(e) =>
-                      setFormData({ ...formData, waterBodyId: e.target.value })
+                      {setFormData({ ...formData, waterBodyId: e.target.value }), handleWaterBodyChange(e.target.value)} 
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -185,7 +225,7 @@ export default function WaterQualityForm() {
                       required
                       min="0"
                       max="20"
-                      step="0.1"
+                      step="0.01"
                       value={formData.do}
                       onChange={(e) =>
                         setFormData({ ...formData, do: e.target.value })
@@ -204,7 +244,7 @@ export default function WaterQualityForm() {
                       required
                       min="0"
                       max="14"
-                      step="0.1"
+                      step="0.01"
                       value={formData.ph}
                       onChange={(e) =>
                         setFormData({ ...formData, ph: e.target.value })
@@ -222,7 +262,7 @@ export default function WaterQualityForm() {
                       type="number"
                       required
                       min="0"
-                      step="0.1"
+                      step="0.01"
                       value={formData.bod}
                       onChange={(e) =>
                         setFormData({ ...formData, bod: e.target.value })
@@ -240,7 +280,7 @@ export default function WaterQualityForm() {
                       type="number"
                       required
                       min="0"
-                      step="0.1"
+                      step="0.01"
                       value={formData.nitrate}
                       onChange={(e) =>
                         setFormData({ ...formData, nitrate: e.target.value })
@@ -293,7 +333,7 @@ export default function WaterQualityForm() {
                     <input
                       type="number"
                       required
-                      step="0.1"
+                      step="0.01"
                       value={formData.temperature}
                       onChange={(e) =>
                         setFormData({ ...formData, temperature: e.target.value })
@@ -310,7 +350,7 @@ export default function WaterQualityForm() {
                     <input
                       type="number"
                       min="0"
-                      step="0.1"
+                      step="0.01"
                       value={formData.turbidity}
                       onChange={(e) =>
                         setFormData({ ...formData, turbidity: e.target.value })
@@ -327,7 +367,7 @@ export default function WaterQualityForm() {
                     <input
                       type="number"
                       min="0"
-                      step="0.1"
+                      step="0.01"
                       value={formData.conductivity}
                       onChange={(e) =>
                         setFormData({ ...formData, conductivity: e.target.value })

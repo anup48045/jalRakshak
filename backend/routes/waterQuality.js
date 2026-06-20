@@ -15,11 +15,11 @@ const AI_MODULE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 async function calculateWQIWithAI(waterQualityData) {
   try {
     const response = await axios.post(`${AI_MODULE_URL}/calculate-wqi`, {
+      temp: waterQualityData.temp,
       do: waterQualityData.do,
       ph: waterQualityData.ph,
       bod: waterQualityData.bod,
-      nitrate: waterQualityData.nitrate,
-      fecalColiform: waterQualityData.fecalColiform
+      totalColiform: waterQualityData.totalColiform
     }, {
       timeout: 5000 // 5 second timeout
     });

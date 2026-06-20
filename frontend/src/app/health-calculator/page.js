@@ -36,39 +36,14 @@ export default function HealthCalculatorPage() {
               ph: formData.ph
                 ? parseFloat(formData.ph)
                 : 7.229067,
-
-              conductivity: formData.conductivity
-                ? parseFloat(formData.conductivity)
-                : 1679.051028,
-
               bod: formData.bod
                 ? parseFloat(formData.bod)
                 : 6.503025,
-
-              nitrate: formData.nitrate
-                ? parseFloat(formData.nitrate)
-                : 1.407751,
-
-              fecalColiform: formData.fecalColiform
-                ? parseFloat(formData.fecalColiform)
-                : 1200,
-
               totalColiform: formData.totalColiform
                 ? parseFloat(formData.totalColiform)
                 : 2500,
             };
-      // const payload = {
-      //   temp: parseFloat(formData.temp),
-      //   do: parseFloat(formData.do),
-      //   ph: parseFloat(formData.ph),
-      //   conductivity: parseFloat(formData.conductivity),
-      //   bod: parseFloat(formData.bod),
-      //   nitrate: parseFloat(formData.nitrate),
-      //   fecalColiform: parseFloat(formData.fecalColiform),
-      //   totalColiform: parseFloat(formData.totalColiform),
-      // };
-      // console.log(payload);
-
+      console.log("Sent data:", payload)
       const response = await fetch("http://localhost:8000/calculate-wqi", {
         method: "POST",
         headers: {
@@ -146,8 +121,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
-                    required
+                    step="0.01"
                     value={formData.temp}
                     onChange={(e) =>
                       setFormData({ ...formData, temp: e.target.value })
@@ -163,7 +137,6 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
                     required
                     value={formData.do}
                     onChange={(e) =>
@@ -180,7 +153,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     required
                     min="0"
                     max="14"
@@ -199,7 +172,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     value={formData.conductivity}
                     onChange={(e) =>
                       setFormData({ ...formData, conductivity: e.target.value })
@@ -215,7 +188,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     required
                     value={formData.bod}
                     onChange={(e) =>
@@ -232,7 +205,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     value={formData.nitrate}
                     onChange={(e) =>
                       setFormData({ ...formData, nitrate: e.target.value })
@@ -248,7 +221,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     value={formData.fecalColiform}
                     onChange={(e) =>
                       setFormData({ ...formData, fecalColiform: e.target.value })
@@ -264,7 +237,7 @@ export default function HealthCalculatorPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     required
                     value={formData.totalColiform}
                     onChange={(e) =>

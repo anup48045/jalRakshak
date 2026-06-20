@@ -22,7 +22,7 @@ export default function OfficerDashboard() {
       return
     }
     fetchDashboardData()
-  }, [user, router, hasRole, user?._id])
+  }, [user, router, hasRole])
 
   // const fetchDashboardData = async () => {
   //   try {
@@ -56,8 +56,9 @@ export default function OfficerDashboard() {
   // }
   const fetchDashboardData = async () => {
   try {
-    console.log('User ID:', user?._id);
-    if (!user?._id) {
+    console.log("Current User:", user);
+    console.log('User ID:', user?.id);
+    if (!user?.id) {
       setLoading(false);
       return;
     }
@@ -78,7 +79,7 @@ export default function OfficerDashboard() {
       });
 
     const surveysPromise = api.get(
-      `/surveys?officerId=${user._id}&limit=5`
+      `/surveys?officerId=${user.id}&limit=5`
     ).catch(err => {
       console.error('Surveys API error:', {
         status: err.response?.status,
@@ -115,9 +116,9 @@ export default function OfficerDashboard() {
       alertsPromise
     ]);
 
-    console.log('Stats Response:', statsRes);
-    console.log('Surveys Response:', surveysRes);
-    console.log('Alerts Response:', alertsRes);
+    // console.log('Stats Response:', statsRes);
+    // console.log('Surveys Response:', surveysRes);
+    // console.log('Alerts Response:', alertsRes);
 
     setStats(statsRes?.data?.stats ?? null);
     setMySurveys(surveysRes?.data?.surveys ?? []);
@@ -198,7 +199,7 @@ export default function OfficerDashboard() {
 
         {/* Officer Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/surveys/new')}>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/surveys/new')}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,9 +209,9 @@ export default function OfficerDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">Conduct a new water body survey</p>
+              <p className="text-sm text-gray-600">Conduct a new water body survey with water quality data</p>
             </CardContent>
-          </Card> */}
+          </Card>
 
           <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/surveys')}>
             <CardHeader>
