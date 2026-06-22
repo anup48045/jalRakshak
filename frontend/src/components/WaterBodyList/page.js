@@ -51,19 +51,27 @@ export default function WaterBodyList({ onWaterBodySelect }) {
 //   }
 // }, [data]);
   const getCurrentQuality = (waterBodyId) => {
-      const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
-    const currentQuality =
-      data?.find(
-        q => q.year === currentYear && q.waterBodyId._id === waterBodyId
-    )
-    if (currentQuality) return currentQuality;
+  if (!data?.length) return null;
+
+  // console.log("Searching for:", waterBodyId);
+  // console.log("Sample record:", data?.[0]);
+
+  const currentQuality = data.find(
+    q =>
+      Number(q.year) === currentYear &&
+      String(q.waterBodyId._id) === String(waterBodyId)
+  );
+
+  if (currentQuality) return currentQuality;
 
   return data
-    ?.filter(q => q.waterBodyId._id === waterBodyId)
-    ?.sort((a, b) => b.year - a.year)[0];
-
-  }
+    .filter(
+      q => String(q.waterBodyId._id) === String(waterBodyId)
+    )
+    .sort((a, b) => Number(b.year) - Number(a.year))[0] || null;
+};
 
   const handleSelect = (waterBody) => {
     setSelectedId(waterBody._id);
@@ -71,18 +79,6 @@ export default function WaterBodyList({ onWaterBodySelect }) {
       onWaterBodySelect(waterBody._id);
     }
   };
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case "healthy":
-  //       return "bg-green-100 text-green-800";
-  //     case "moderate":
-  //       return "bg-yellow-100 text-yellow-800";
-  //     case "critical":
-  //       return "bg-red-100 text-red-800";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
   const getStatusColor = (status) => {
     switch (status) {
       case "excellent":

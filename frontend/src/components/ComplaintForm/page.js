@@ -16,6 +16,7 @@ export default function ComplaintForm() {
     title: "",
     issueType: "pollution",
     description: "",
+    locationName:"",
     location: "",
     waterBodyId: "",
     waterBodyName:"",
@@ -115,6 +116,7 @@ export default function ComplaintForm() {
         title: formData.title || null,
         issueType: formData.issueType,
         description: formData.description,
+        locationName: formData.locationName,
         location: formData.location,
         waterBodyId: formData.waterBodyId || null,
         waterBodyName: formData.waterBodyName || null,
@@ -131,6 +133,7 @@ export default function ComplaintForm() {
         JSON.stringify(payload).length / 1024 / 1024,
         "MB"
       );
+      console.log("Sent complaints:", payload)
       await api.post("/citizen-reports", payload);
 
       toast.success("Complaint submitted successfully");
@@ -206,11 +209,25 @@ export default function ComplaintForm() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location *
+                Location Name *
               </label>
               <input
                 type="text"
                 required
+                value={formData.locationName}
+                onChange={(e) =>
+                  setFormData({ ...formData, locationName: e.target.value })
+                }
+                placeholder="Address or location of the polluted water body"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Location Coordinates
+              </label>
+              <input
+                type="text"
                 value={formData.location}
                 onChange={(e) =>
                   setFormData({ ...formData, location: e.target.value })

@@ -24,36 +24,6 @@ export default function OfficerDashboard() {
     fetchDashboardData()
   }, [user, router, hasRole])
 
-  // const fetchDashboardData = async () => {
-  //   try {
-  //     if (!user?._id) {
-  //     setLoading(false);
-  //     return;
-  //   }
-  //     const [statsRes, surveysRes, alertsRes] = await Promise.all([
-  //       api.get('/dashboard/stats').catch(err => {
-  //         console.error('Stats API error:', err)
-  //         return { data: { stats: null } }
-  //       }),
-  //       api.get('/surveys?officerId=' + user._id + '&limit=5').catch(err => {
-  //         console.error('Surveys API error:', err)
-  //         return { data: { surveys: [] } }
-  //       }),
-  //       api.get('/dashboard/recent-alerts?limit=5').catch(err => {
-  //         console.error('Alerts API error:', err)
-  //         return { data: { alerts: [] } }
-  //       })
-  //     ])
-  //     setStats(statsRes.data.stats)
-  //     setMySurveys(surveysRes.data.surveys || [])
-  //     setRecentAlerts(alertsRes.data.alerts || [])
-  //   } catch (error) {
-  //     console.error('Dashboard data loading error:', error)
-  //     toast.error('Failed to load dashboard data: ' + (error.response?.data?.message || error.message))
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
   const fetchDashboardData = async () => {
   try {
     console.log("Current User:", user);
@@ -117,7 +87,7 @@ export default function OfficerDashboard() {
     ]);
 
     // console.log('Stats Response:', statsRes);
-    // console.log('Surveys Response:', surveysRes);
+    console.log('Surveys Response:', surveysRes);
     // console.log('Alerts Response:', alertsRes);
 
     setStats(statsRes?.data?.stats ?? null);
@@ -270,10 +240,10 @@ export default function OfficerDashboard() {
                   <div key={survey._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">{survey.waterBodyId?.name || 'Unknown'}</p>
-                      <p className="text-sm text-gray-600">{survey.observations?.substring(0, 50)}...</p>
+                      <p className="text-sm text-gray-600">{survey.remarks?.substring(0, 50)}...</p>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {new Date(survey.createdAt).toLocaleDateString()}
+                      Date: {new Date(survey.createdAt).toISOString().split("T")[0]}
                     </span>
                   </div>
                 ))}

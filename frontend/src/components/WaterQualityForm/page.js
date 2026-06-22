@@ -67,7 +67,7 @@ export default function WaterQualityForm() {
 
   const quality = qualityData.find(
     q =>
-      q.waterBodyId._id === waterBodyId &&
+      q.waterBodyId === waterBodyId &&
       q.year === currentYear
   );
 

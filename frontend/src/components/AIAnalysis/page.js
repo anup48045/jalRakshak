@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 export default function AIAnalysis() {
+  const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -16,6 +17,16 @@ export default function AIAnalysis() {
       setPreview(URL.createObjectURL(file));
       setResult(null);
       setError(null);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setPreview(null);
+    setResult(null);
+    setError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -83,6 +94,7 @@ export default function AIAnalysis() {
         {/* File Upload Section */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={handleFileSelect}
@@ -94,11 +106,13 @@ export default function AIAnalysis() {
             className="cursor-pointer block"
           >
             {preview ? (
-              <img
-                src={preview}
-                alt="Preview"
-                className="max-h-64 mx-auto rounded-lg"
-              />
+              <div className="space-y-4">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="max-h-64 mx-auto rounded-lg"
+                />
+              </div>
             ) : (
               <div>
                 <svg
@@ -123,6 +137,18 @@ export default function AIAnalysis() {
               </div>
             )}
           </label>
+
+          {preview && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Remove image
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Analyze Button */}

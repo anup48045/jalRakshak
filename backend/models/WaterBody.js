@@ -32,17 +32,6 @@ const waterBodySchema = new mongoose.Schema({
     enum: ['lake', 'pond', 'wetland', 'reservoir', 'river'],
     required: [true, 'Please provide a category']
   },
-  status: {
-    type: String,
-    enum: ['healthy', 'moderate', 'critical'],
-    default: 'moderate'
-  },
-  healthScore: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 100
-  },
   description: {
     type: String,
     trim: true

@@ -38,6 +38,11 @@ const citizenReportSchema = new mongoose.Schema({
   images: [{
     type: String
   }],
+  locationName: {
+    type:String,
+    required: true,
+    trim: true,
+  },
   location: {
     type: {
       type: String,

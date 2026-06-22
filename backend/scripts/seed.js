@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const WaterBody = require('../models/WaterBody');
-const { getStatusFromHealthScore } = require('../utils/healthScore');
+// const { getStatusFromHealthScore } = require('../utils/healthScore');
 const path = require('path');
 const xlsx = require('xlsx');
 
@@ -12,9 +12,18 @@ const seedData = async () => {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jalrakshak');
     console.log('MongoDB Connected');
 
-    // Clear existing data
+    // Clear existing data and drop indexes
     await User.deleteMany();
     await WaterBody.deleteMany();
+    // Drop all indexes on WaterBody collection to remove any unique constraints
+    try {
+      const indexInfo = await WaterBody.collection.getIndexes();
+      console.log('Existing indexes before drop:', JSON.stringify(indexInfo, null, 2));
+      await WaterBody.collection.dropIndexes();
+      console.log('All non-_id indexes dropped');
+    } catch (err) {
+      console.log('Note:', err.message);
+    }
     console.log('Cleared existing data');
 
     // Create users
@@ -60,7 +69,7 @@ const seedData = async () => {
     console.log('Created users');
 
     // Load water bodies from Excel file
-    const excelPath = path.resolve(__dirname, '..', '..', 'visible_wbs-listed-631-water-bodies.xlsx');
+    const excelPath = path.resolve(__dirname, '..', '..', 'visible_wbs-listed-626-water-bodies.xlsx');
     let waterBodies = [];
     try {
       const workbook = xlsx.readFile(excelPath);
@@ -124,14 +133,7 @@ const seedData = async () => {
         if (val == null) return [null, null];
         let s = String(val).trim();
 
-        const latMatch = s.match(/(\d{1,3})\D+(\d{1,3})\D+(\d{1,3}(?:\.\d+)?)\D*([NS])/i);
-        const lonMatch = s.match(/(\d{1,3})\D+(\d{1,3})\D+(\d{1,3}(?:\.\d+)?)\D*([EW])/i);
-
-        if (latMatch && lonMatch) {
-          const lat = parseDMS(latMatch[1], latMatch[2], latMatch[3], latMatch[4]);
-          const lon = parseDMS(lonMatch[1], lonMatch[2], lonMatch[3], lonMatch[4]);
-          return [lat, lon];
-        }
+        s = s.replace(/\r?\n/g, ' ');
 
         // Try decimal numbers first
         const decimals = s.match(/-?\d+\.\d+/g);
@@ -141,8 +143,45 @@ const seedData = async () => {
           return [lat, lon];
         }
 
+        // DDM format: 28 37.390'N 77 17.319'E
+        const latDDM = s.match(
+          /(\d{1,3})\D+(\d+(?:\.\d+)?)\D*([NS])/i
+        );
+
+        const lonDDM = s.match(
+          /([0-9]{1,3})\D+(\d+(?:\.\d+)?)\D*([EW])/i
+        );
+
+        if (latDDM && lonDDM) {
+          let lat =
+            Number(latDDM[1]) +
+            Number(latDDM[2]) / 60;
+
+          let lon =
+            Number(lonDDM[1]) +
+            Number(lonDDM[2]) / 60;
+
+          if (latDDM[3].toUpperCase() === "S") lat = -lat;
+          if (lonDDM[3].toUpperCase() === "W") lon = -lon;
+
+          return [lat, lon];
+        }
+        const latMatch = s.match(/(\d{1,3})\D+(\d{1,3})\D+(\d{1,3}(?:\.\d+)?)\D*([NS])/i);
+        const lonMatch = s.match(/(\d{1,3})\D+(\d{1,3})\D+(\d{1,3}(?:\.\d+)?)\D*([EW])/i);
+
+        if (latMatch && lonMatch) {
+          const lat = parseDMS(latMatch[1], latMatch[2], latMatch[3], latMatch[4]);
+          const lon = parseDMS(lonMatch[1], lonMatch[2], lonMatch[3], lonMatch[4]);
+          return [lat, lon];
+        }
+
+
         return [null, null];
       };
+
+      let skippedCount = 0;
+      let invalidCoordCount = 0;
+      let missingNameCount = 0;
 
       rows.forEach((row, i) => {
         const keys = Object.keys(row);
@@ -153,8 +192,6 @@ const seedData = async () => {
         const districtKey = findKey(keys, ['district', 'zone', 'ward']);
         const areaKey = findKey(keys, ['area', 'area in', 'ha', 'size']);
         const categoryKey = findKey(keys, ['category', 'type']);
-        const statusKey = findKey(keys, ['status', 'condition']);
-        const healthKey = findKey(keys, ['healthscore', 'health_score', 'score']);
         const descKey = findKey(keys, ['description', 'notes', 'remarks', 'present condition']);
 
         const name = nameKey ? String(row[nameKey]).trim() : null;
@@ -176,51 +213,33 @@ const seedData = async () => {
           area = area * 10000; // ha to m^2
         }
         let category = categoryKey ? String(row[categoryKey]).toLowerCase().trim() : null;
-        const status = statusKey && row[statusKey] ? String(row[statusKey]).toLowerCase().trim() : null;
-        const healthScore = healthKey && row[healthKey] ? Number(row[healthKey]) : null;
         const description = descKey && row[descKey] ? String(row[descKey]) : null;
 
         if (!name || name === 'null' || name === 'undefined' || name.trim() === '') {
+          missingNameCount++;
           return;
         }
         if (lat == null || lon == null || Number.isNaN(lat) || Number.isNaN(lon)) {
+          skippedCount++;
+          return;
+        }
+        // Validate coordinate ranges: latitude -90 to 90, longitude -180 to 180
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+          console.log("==============");
+          console.log("Name:", name);
+          console.log("Raw coord:", row[coordKey]);
+          console.log("Parsed:", lat, lon);
+          console.log("==============");
+          // console.warn(`Skipping row ${i}: Invalid coordinates - lat: ${lat}, lon: ${lon} for water body: ${name}`);
+          invalidCoordCount++;
           return;
         }
         const allowedCategories = ['lake', 'pond', 'wetland', 'reservoir', 'river'];
         if (!category || !allowedCategories.includes(category)) {
           category = 'lake';
         }
-
-        let finalHealthScore = 65;
-
-        const descLower = description ? description.toLowerCase() : '';
-        if (
-          descLower.includes('very good') ||
-          descLower.includes('beautified') ||
-          descLower.includes('cleaned') ||
-          descLower.includes('flora') ||
-          (descLower.includes('developed') && descLower.includes('wet') && !descLower.includes('dry'))
-        ) {
-          finalHealthScore = 80 + Math.floor(Math.random() * 16); // 80 to 95
-        } else if (
-          descLower.includes('dried') ||
-          descLower.includes('dry') ||
-          descLower.includes('no water') ||
-          descLower.includes('vacant') ||
-          descLower.includes('encroachment') ||
-          descLower.includes('encroached')
-        ) {
-          finalHealthScore = 15 + Math.floor(Math.random() * 30); // 15 to 44
-        } else {
-          finalHealthScore = 50 + Math.floor(Math.random() * 25); // 50 to 74
-        }
-
-        if (healthScore != null && !Number.isNaN(healthScore) && healthScore > 0) {
-          finalHealthScore = healthScore;
-        }
-
-        const finalStatus = getStatusFromHealthScore(finalHealthScore);
-
+        // const descLower = description ? description.toLowerCase() : '';
+        
         waterBodies.push({
           name,
           location: { type: 'Point', coordinates: [parseFloat(lon), parseFloat(lat)] },
@@ -228,8 +247,6 @@ const seedData = async () => {
           district: district || 'Unknown',
           area: area || 0,
           category,
-          status: finalStatus,
-          healthScore: finalHealthScore,
           description: description || ''
         });
       });
@@ -238,6 +255,12 @@ const seedData = async () => {
         console.warn('No valid water bodies found in Excel, seeding sample defaults');
         waterBodies = [];
       }
+
+      console.log(`Processed ${rows.length} rows from Excel`);
+      console.log(`Skipped ${skippedCount} rows with missing/invalid coordinates`);
+      console.log(`Skipped ${invalidCoordCount} rows with out-of-bounds coordinates`);
+      console.log(`Skipped ${missingNameCount} rows with missing names`);
+      console.log(`Valid water bodies to insert: ${waterBodies.length}`);
     } catch (ex) {
       console.error('Failed to read Excel file at', excelPath, ex);
       waterBodies = [];
@@ -246,20 +269,86 @@ const seedData = async () => {
     if (waterBodies.length) {
       console.log('Sample water body:');
       console.log(JSON.stringify(waterBodies[0], null, 2));
-      try {
-        await WaterBody.insertMany(
-          waterBodies,
-          { ordered: false }
-        );
-      } catch (err) {
-        console.error('insertMany error:', err.message);
-        if (err.writeErrors) {
-          console.error('First 5 write errors:', err.writeErrors.slice(0, 5).map(e => e.errmsg || e.message));
+      
+      // Validate records before insertion
+      let validRecords = [];
+      let validationErrors = {};
+      
+      waterBodies.forEach((wb, idx) => {
+        const errors = [];
+        if (!wb.name || wb.name.trim() === '') errors.push('Missing name');
+        if (!wb.location || !wb.location.coordinates || wb.location.coordinates.length !== 2) errors.push('Invalid location');
+        if (!wb.district || wb.district.trim() === '') errors.push('Missing district');
+        if (wb.area === undefined || wb.area === null || typeof wb.area !== 'number') errors.push('Invalid area');
+        if (!wb.category) errors.push('Missing category');
+        
+        // Check coordinate validity for GeoJSON
+        const [lon, lat] = wb.location?.coordinates || [null, null];
+        if (lon === null || lat === null || Number.isNaN(lon) || Number.isNaN(lat)) {
+          errors.push('Invalid coordinates - NaN detected');
         }
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+          errors.push(`Out of bounds: lon=${lon}, lat=${lat}`);
+        }
+        
+        if (errors.length > 0) {
+          validationErrors[idx] = { name: wb.name, errors };
+        } else {
+          validRecords.push(wb);
+        }
+      });
+      
+      console.log(`\nValidation Results:`);
+      console.log(`  Valid records: ${validRecords.length}`);
+      console.log(`  Invalid records: ${waterBodies.length - validRecords.length}`);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        console.log(`\nFirst 10 validation errors:`);
+        Object.entries(validationErrors).slice(0, 10).forEach(([idx, err]) => {
+          console.log(`  Row ${idx} (${err.name}): ${err.errors.join(', ')}`);
+        });
       }
-      console.log(`Created ${waterBodies.length} water bodies from Excel`);
+      
+      if (validRecords.length > 0) {
+        console.log(`\nInserting ${validRecords.length} records in batches of 50...`);
+        let totalInserted = 0;
+        const batchSize = 50;
+        
+        for (let i = 0; i < validRecords.length; i += batchSize) {
+          const batch = validRecords.slice(i, i + batchSize);
+          const batchNum = Math.floor(i / batchSize) + 1;
+          const totalBatches = Math.ceil(validRecords.length / batchSize);
+          
+          try {
+            // Use ordered: true to catch errors immediately
+            const result = await WaterBody.insertMany(batch, { ordered: true });
+            totalInserted += result.length;
+            console.log(`  ✓ Batch ${batchNum}/${totalBatches}: Inserted ${result.length}/${batch.length} records`);
+            
+            if (result.length < batch.length) {
+              console.warn(`    ⚠ Expected ${batch.length} but only got ${result.length}!`);
+              // Show which records might have failed
+              console.log(`    Sample from this batch: ${batch[0].name}, ${batch[Math.floor(batch.length/2)].name}`);
+            }
+          } catch (err) {
+            console.error(`  ❌ Batch ${batchNum}/${totalBatches} failed`);
+            console.error(`    Error: ${err.message}`);
+            if (err.writeErrors) {
+              console.error(`    Write errors: ${err.writeErrors.length}`);
+              console.error(`    First error: ${err.writeErrors[0].errmsg}`);
+            }
+            // Continue with next batch
+          }
+        }
+        
+        console.log(`\n✓ Batch insert complete. Total inserted: ${totalInserted}`);
+      }
+      
       const finalCount = await WaterBody.countDocuments();
-      console.log('Water bodies in database now:', finalCount);
+      console.log(`\nFinal summary:`);
+      console.log(`  Prepared from Excel: ${waterBodies.length}`);
+      console.log(`  Passed validation: ${validRecords.length}`);
+      console.log(`  Water bodies in database: ${finalCount}`);
     } else {
       console.log('No water bodies created');
     }

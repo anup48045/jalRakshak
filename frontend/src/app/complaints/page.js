@@ -36,7 +36,7 @@ export default function ComplaintsPage() {
 
       const res = await api.get(url);
 
-      console.log("Response:", res.data);
+      console.log("Complain Response:", res.data);
       setComplaints(res.data.reports || []);
 
     } catch (error) {
@@ -119,6 +119,7 @@ export default function ComplaintsPage() {
                         {complaint.description}
                       </p>
                       <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                        <span>📍 {complaint.locationName}</span><br/>
                         <span>📍 {complaint.location}</span>
                         <span>
                           {new Date(complaint.createdAt).toLocaleDateString()}
