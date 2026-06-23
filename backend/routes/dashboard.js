@@ -15,9 +15,24 @@ const router = express.Router();
 router.get('/stats', protect, async (req, res) => {
   try {
     const totalWaterBodies = await WaterBody.countDocuments();
-    const healthyWaterBodies = await WaterBody.countDocuments({ status: 'healthy' });
-    const moderateWaterBodies = await WaterBody.countDocuments({ status: 'moderate' });
-    const criticalWaterBodies = await WaterBody.countDocuments({ status: 'critical' });
+
+    const currentYear = new Date().getFullYear();
+
+    const healthyWaterBodies =
+      await WaterQuality.countDocuments({
+        year: currentYear,
+        status: 'excellent'
+      });
+    const moderateWaterBodies =
+      await WaterQuality.countDocuments({
+        year: currentYear,
+        status: 'good'
+      });
+    const criticalWaterBodies =
+      await WaterQuality.countDocuments({
+        year: currentYear,
+        status: 'critical'
+      });
     const activeAlerts = await Alert.countDocuments({ resolved: false });
     const surveysCompleted = await Survey.countDocuments();
     const citizenReports = await CitizenReport.countDocuments();

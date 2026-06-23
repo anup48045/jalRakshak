@@ -32,6 +32,7 @@ export default function AdminDashboard() {
       // Fetch stats
       try {
         const statsRes = await api.get('/dashboard/stats')
+        console.log("StatsRes in Admin:",statsRes)
         setStats(statsRes.data.stats)
       } catch (error) {
         console.error('Stats fetch error:', error)
