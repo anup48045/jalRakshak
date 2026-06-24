@@ -45,11 +45,11 @@ export default function AIAnalysis() {
       if (!aiUrl) {
         throw new Error("NEXT_PUBLIC_AI_URL is not defined");
       }
-      const response = await fetch(`{aiUrl}/analyze`, {
+      const response = await fetch(`${aiUrl}/analyze`, {
         method: "POST",
         body: formData,
       });
-
+      
       if (!response.ok) {
         throw new Error("Analysis failed");
       }
