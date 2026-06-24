@@ -41,7 +41,11 @@ export default function AIAnalysis() {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch("http://localhost:8000/analyze", {
+      const aiUrl = process.env.NEXT_PUBLIC_AI_URL;
+      if (!aiUrl) {
+        throw new Error("NEXT_PUBLIC_AI_URL is not defined");
+      }
+      const response = await fetch(`{aiUrl}/analyze`, {
         method: "POST",
         body: formData,
       });
