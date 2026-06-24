@@ -4,11 +4,15 @@ const Alert = require('../models/Alert');
 const WaterBody = require('../models/WaterBody');
 const WaterQuality = require('../models/WaterQuality');
 const { checkAlertThresholds, mergeThresholdAlerts } = require('../utils/healthScore');
+const path = require('path');
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env.local')
+});
 
 async function seedAlertData() {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jalrakshak');
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected and uri:', process.env.MONGODB_URI);
 
     await Alert.deleteMany();
     console.log('Cleared existing alerts');

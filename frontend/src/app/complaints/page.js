@@ -104,11 +104,11 @@ export default function ComplaintsPage() {
           {complaints.length === 0 ? (
             <p className="text-sm text-gray-500">No complaints found</p>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               {complaints.map((complaint) => (
                 <div
                   key={complaint._id}
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 shadow-md hover:shadow-lg"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>

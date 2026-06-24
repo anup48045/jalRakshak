@@ -1,16 +1,19 @@
-require('dotenv').config();
+// require('dotenv').config({path: '.env.local'});;
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const WaterBody = require('../models/WaterBody');
 // const { getStatusFromHealthScore } = require('../utils/healthScore');
 const path = require('path');
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env.local')
+});
 const xlsx = require('xlsx');
 
 const seedData = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jalrakshak');
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected and uri is', process.env.MONGODB_URI);
 
     // Clear existing data and drop indexes
     await User.deleteMany();

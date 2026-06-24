@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const WaterBody = require('../models/WaterBody');
 const WaterQuality = require('../models/WaterQuality');
 const { getStatusFromHealthScore, calculateHealthScore,  } = require('../utils/healthScore');
+const path = require('path');
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env.local')
+});
 
 function randomBetween(min, max, decimals = 2) {
   return Number((Math.random() * (max - min) + min).toFixed(decimals));
@@ -45,7 +49,7 @@ function generateYrWiseData(waterBodies){
 async function generateWaterQualityData() {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jalrakshak');
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected and uri:',process.env.MONGODB_URI);
     const waterBodies = await WaterBody.find();
     // Clear existing data
      await WaterQuality.deleteMany();

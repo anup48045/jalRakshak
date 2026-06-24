@@ -17,13 +17,13 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true)
   const [selectedWaterBody, setSelectedWaterBody] = useState(null)
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    fetchWaterBodies()
-  }, [user, router])
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.push('/login')
+  //     return
+  //   }
+  //   fetchWaterBodies()
+  // }, [user, router])
 
   const fetchWaterBodies = async () => {
     try {

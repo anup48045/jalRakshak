@@ -89,17 +89,6 @@ export default function LoginPage() {
           </div>
         </CardContent>
       </Card>
-      {/* <iframe
-        // src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14009.123456789012!2d77.2090!3d28.6139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b12345678%3A0xabcdef1234567890!2sDelhi%20Government%20Headquarters!5e0!3m2!1sen!2sin!4v1234567890123"
-        src= "https://www.google.com/maps/d/viewer?mid=1BjMwuPVlftwaPaop5GfE_hJPU_d1oaYv&ll=28.574857167401497%2C77.16797455115639&z=11"
-        width="600"
-        height="450"
-        style={{ border: 0 }}
-        allowFullScreen=""
-        loading="lazy"
-        className="hidden md:block absolute top-0 right-0 w-1/2 h-full object-cover"
-      ></iframe> */}
-      {/* <iframe src="https://www.google.com/maps/d/embed?mid=1BjMwuPVlftwaPaop5GfE_hJPU_d1oaYv&ehbc=2E312F" width="640" height="480"></iframe> */}
     </div>
   )
 }

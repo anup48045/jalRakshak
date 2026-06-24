@@ -36,7 +36,7 @@ const RealTimeMap = () => {
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-3.5 w-3.5 rounded-full bg-sky-500" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Monitoring</p>
+                  <p className="text-sm font-semibold text-slate-900">Good</p>
                   <p className="mt-1 text-sm text-slate-600">Ongoing observation with minor variations.</p>
                 </div>
               </div>
@@ -46,7 +46,7 @@ const RealTimeMap = () => {
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-3.5 w-3.5 rounded-full bg-amber-500" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Moderate</p>
+                  <p className="text-sm font-semibold text-slate-900">Poor</p>
                   <p className="mt-1 text-sm text-slate-600">Elevated pollution levels need attention.</p>
                 </div>
               </div>
@@ -56,7 +56,7 @@ const RealTimeMap = () => {
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-3.5 w-3.5 rounded-full bg-rose-500" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Action Needed</p>
+                  <p className="text-sm font-semibold text-slate-900">Critical</p>
                   <p className="mt-1 text-sm text-slate-600">Critical conditions require immediate response.</p>
                 </div>
               </div>
@@ -73,15 +73,15 @@ const RealTimeMap = () => {
               </div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-4 w-4 rounded-full bg-sky-500" />
-                <span className="text-sm text-slate-700">Monitoring - Stable, under observation</span>
+                <span className="text-sm text-slate-700">Good - Stable, under observation</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-4 w-4 rounded-full bg-amber-500" />
-                <span className="text-sm text-slate-700">Moderate - Elevated risk or pollution</span>
+                <span className="text-sm text-slate-700">Poor - Elevated risk or pollution</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-4 w-4 rounded-full bg-rose-500" />
-                <span className="text-sm text-slate-700">Action Needed - Critical or unsafe</span>
+                <span className="text-sm text-slate-700">Critical - Critical or unsafe</span>
               </div>
             </div>
           </div>
