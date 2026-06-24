@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
+
 export default function HealthCalculatorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -44,7 +45,11 @@ export default function HealthCalculatorPage() {
                 : 2500,
             };
       console.log("Sent data:", payload)
-      const response = await fetch("http://localhost:8000/calculate-wqi", {
+      const aiUrl = process.env.NEXT_PUBLIC_AI_URL;
+      if (!aiUrl) {
+        throw new Error("NEXT_PUBLIC_AI_URL is not defined");
+      }
+      const response = await fetch(`${aiUrl}/calculate-wqi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
