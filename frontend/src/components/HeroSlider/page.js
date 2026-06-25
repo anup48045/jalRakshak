@@ -53,7 +53,7 @@ export default function HeroSlider(){
           Delhi's blue infrastructure through real-time monitoring and
           community reporting.
         </p>
-        <div className="mt-6 ml-[-268px] flex gap-4">
+        <div className="mt-6 md:ml-[-268px] flex gap-4">
               <Link href="/geomap" className="px-6 py-3 bg-blue-600 text-white rounded-md shadow hover:brightness-95">Water Bodies Geo Map</Link>
               <Link href="/about" className="px-6 py-3 border border-slate-300 rounded-md text-slate-100 hover:bg-blue-600">Learn More</Link>
             </div>

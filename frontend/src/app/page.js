@@ -25,24 +25,24 @@ export default function Home() {
     <div className="home bg-gradient-to-r from-blue-600 via-gray-700 to-cyan-400">
       <HeroSlider />
       <section className="max-w-7xl mx-auto py-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 m-2">
 
-          <div className="bg-white border border-slate-200 rounded-lg p-6 text-center shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-lg p-3 text-center shadow-sm">
             <h3 className="text-3xl font-bold text-[#003366]">624+</h3>
             <p className="text-slate-600 mt-2">Total Water Bodies</p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg p-6 text-center shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-lg p-3 text-center shadow-sm">
             <h3 className="text-3xl font-bold text-[#003366]">450+</h3>
             <p className="text-slate-600 mt-2">Actively Monitored</p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg p-6 text-center shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-lg p-3 text-center shadow-sm">
             <h3 className="text-3xl font-bold text-[#003366]">24×7</h3>
             <p className="text-slate-600 mt-2">Monitoring System</p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg p-6 text-center shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-lg p-3 text-center shadow-sm">
             <h3 className="text-3xl font-bold text-[#003366]">100%</h3>
             <p className="text-slate-600 mt-2">GIS Coverage</p>
           </div>
