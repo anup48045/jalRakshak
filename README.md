@@ -1,7 +1,6 @@
 # 🌊 JalRakshak - Real-Time Survey & Monitoring of Water Bodies in Delhi
 
-## Smart India Hackathon (SIH) 2024 - Problem Statement ID: 1619
-
+<!-- ## Smart India Hackathon (SIH) 2024 - Problem Statement ID: 1619 -->
 A centralized digital platform that enables government officials to monitor, survey, analyze, and manage water bodies across Delhi in real time.
 
 ---
@@ -122,7 +121,6 @@ jalrakshak/
 │   │   ├── waterBodies.js
 │   │   ├── surveys.js       # Updated with WQI integration
 │   │   ├── waterQuality.js  # AI module integration
-│   │   ├── calculate_wqi.js # WQI calculation helper
 │   │   ├── alerts.js
 │   │   ├── citizenReports.js
 │   │   └── dashboard.js
