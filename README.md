@@ -10,7 +10,7 @@ A centralized digital platform that enables government officials to monitor, sur
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - MongoDB (local or Atlas)
 - Python 3.9+ (for AI module)
 - Git
@@ -38,6 +38,7 @@ cd ../ai-module && pip install -r requirements.txt
 cd backend
 cp .env.example .env
 # Edit .env with your MongoDB URI and other credentials
+# Required: MONGODB_URI, JWT_SECRET, AI_SERVICE_URL
 
 # Frontend environment
 cd ../frontend
@@ -60,9 +61,9 @@ node scripts/seedAlert.js
 
 This will create:
 - 1 Admin user
-- 2 Field officers
-- 1 Government official
-- Sample water bodies in Delhi
+- 1 Field officers
+- 1 Citizen
+- 629+ water bodies from Delhi wetland data
 
 ### Run Development Servers
 
@@ -85,12 +86,21 @@ jalrakshak/
 ├── frontend/                 # Next.js 15 frontend (JavaScript)
 │   ├── src/
 │   │   ├── app/             # Next.js app directory
-│   │   │   ├── dashboard/   # Dashboard page
+│   │   │   ├── dashboard/   # Dashboard pages (admin, officer, citizen)
 │   │   │   ├── map/         # GIS map page
 │   │   │   ├── alerts/      # Alerts management
-│   │   │   └── login/       # Authentication
+│   │   │   ├── surveys/     # Survey creation and listing
+│   │   │   ├── health-calculator/  # WQI calculator page
+│   │   │   ├── other-state-data/   # CPCB real-time monitoring
+│   │   │   ├── water-bodies/  # Water body management
+│   │   │   ├── complaints/  # Citizen complaints
+│   │   │   ├── login/       # Authentication
+│   │   │   └── page.js      # Homepage
 │   │   ├── components/      # Reusable components
-│   │   │   └── ui/          # UI components (Button, Card, Input)
+│   │   │   ├── ui/          # UI components (Button, Card, Input)
+│   │   │   ├── Navbar/      # Navigation
+│   │   │   ├── ComplaintForm/  # Citizen complaint form
+│   │   │   └── UserManagement/  # User management
 │   │   ├── lib/             # Utilities (axios, utils)
 │   │   ├── store/           # Zustand state management
 │   │   └── types/           # Type definitions (reference)
@@ -102,7 +112,7 @@ jalrakshak/
 │   ├── models/              # Mongoose schemas
 │   │   ├── User.js
 │   │   ├── WaterBody.js
-│   │   ├── Survey.js
+│   │   ├── Survey.js        # Updated with water quality data
 │   │   ├── WaterQuality.js
 │   │   ├── Alert.js
 │   │   └── CitizenReport.js
@@ -110,19 +120,21 @@ jalrakshak/
 │   │   ├── auth.js
 │   │   ├── users.js
 │   │   ├── waterBodies.js
-│   │   ├── surveys.js
-│   │   ├── waterQuality.js
+│   │   ├── surveys.js       # Updated with WQI integration
+│   │   ├── waterQuality.js  # AI module integration
+│   │   ├── calculate_wqi.js # WQI calculation helper
 │   │   ├── alerts.js
 │   │   ├── citizenReports.js
 │   │   └── dashboard.js
 │   ├── utils/               # Helper functions
 │   │   └── healthScore.js   # Health score calculation
 │   ├── scripts/             # Database seeding
-│   │   └── seed.js
+│   │   └── seed.js          # Excel-based water body seeding
 │   ├── server.js            # Main server file
 │   └── package.json
 ├── ai-module/               # Python FastAPI AI module
-│   ├── main.py              # FastAPI application
+│   ├── main.py              # FastAPI application with WQI endpoint
+│   ├── wqi_model.pkl        # Random Forest model for WQI prediction
 │   ├── requirements.txt     # Python dependencies
 │   └── README.md
 ├── package.json             # Root package.json
@@ -146,10 +158,10 @@ After running the seed script, you can use these credentials:
 - Password: officer123
 - Access: Conduct surveys, upload photos
 
-### Government Official
-- Email: official@delhi.gov.in
-- Password: official123
-- Access: View dashboards, review reports, resolve alerts
+### Citizen
+- Email: adi4576@gmail.com
+- Password: citizen123
+- Access: Report issues, view water body status
 
 ---
 
@@ -181,7 +193,8 @@ After running the seed script, you can use these credentials:
 - **Language**: Python
 - **Image Processing**: OpenCV, PIL
 - **ML Model**: YOLOv11 (placeholder - color-based analysis)
-- **Dependencies**: PyTorch, Ultralytics
+- **WQI Model**: Random Forest Regression (wqi_model.pkl)
+- **Dependencies**: scikit-learn, joblib
 
 ---
 
@@ -199,6 +212,7 @@ After running the seed script, you can use these credentials:
    - Geo-location storage (GeoJSON)
    - GIS integration with Leaflet
    - Category classification (lake, pond, wetland, reservoir, river)
+   - Excel-based data seeding with coordinate validation
 
 3. **GIS Mapping**
    - Interactive map of all Delhi water bodies
@@ -211,42 +225,62 @@ After running the seed script, you can use these credentials:
    - Photo upload support
    - Pollution and encroachment reporting
    - Survey history tracking
+   - **Water quality data collection** (Temperature, DO, pH, Conductivity, BOD, Nitrate, Fecal Coliform, Total Coliform)
+   - **AI-powered WQI calculation** during survey creation
+   - Automatic water body health score updates
 
 5. **Water Quality Monitoring**
    - Track DO, pH, BOD, Nitrate, Coliform
    - Historical trend analysis
    - Lab test recording
    - Quality parameter validation
+   - **AI module integration for WQI prediction**
 
 6. **Health Score Engine**
    - Automatic health score calculation (0-100)
    - Based on water quality parameters
-   - Status classification (Healthy, Moderate, Critical)
+   - Status classification (Excellent, Good, Poor, Critical)
    - Real-time score updates
+   - **Random Forest model prediction via AI module**
 
-7. **Alert Management**
+7. **WQI Calculator**
+   - Standalone health score calculator page
+   - User input for all water quality parameters
+   - Real-time WQI calculation using AI model
+   - Status and classification display
+   - Visual feedback and guidelines
+
+8. **Alert Management**
    - Automatic alert generation
    - Threshold-based alerts (BOD, DO, Fecal Coliform)
    - Alert acknowledgment and resolution
    - Severity levels (Low, Medium, High, Critical)
 
-8. **Dashboard Analytics**
+9. **Dashboard Analytics**
    - Real-time statistics
    - District-wise breakdown
    - Recent alerts and surveys
    - Quality trend charts
+   - Role-specific dashboards (Admin, Officer, Citizen)
 
-9. **Citizen Reporting**
-   - Public pollution reporting
-   - Image upload
-   - Location sharing
-   - Admin verification workflow
+10. **Citizen Reporting**
+    - Public pollution reporting
+    - Image upload
+    - Location sharing
+    - Admin verification workflow
+    - Anonymous reporting option
 
-10. **AI Image Analysis**
+11. **AI Image Analysis**
     - Pollution detection from images
     - Water hyacinth detection
     - Murky water identification
     - Foam pollution detection
+
+12. **Real-Time Monitoring**
+    - CPCB water quality data integration
+    - Live monitoring station display
+    - Parameter-wise data grouping
+    - Status indicators based on water quality standards
 
 ---
 
@@ -266,10 +300,11 @@ After running the seed script, you can use these credentials:
 - `DELETE /api/waterbodies/:id` - Delete water body (Admin)
 
 ### Surveys
-- `GET /api/surveys` - Get all surveys
+- `GET /api/surveys` - Get all surveys (with waterBodyId, officerId filters)
 - `GET /api/surveys/:id` - Get single survey
-- `POST /api/surveys` - Create survey (Officer)
+- `POST /api/surveys` - Create survey with water quality data (Officer)
 - `PUT /api/surveys/:id` - Update survey (Officer)
+- `DELETE /api/surveys/:id` - Delete survey (Admin)
 
 ### Water Quality
 - `GET /api/waterquality` - Get all quality records
@@ -297,10 +332,33 @@ After running the seed script, you can use these credentials:
 ### Endpoints
 - `GET /` - API info
 - `GET /health` - Health check
-- `POST /analyze` - Analyze single image
+- `POST /analyze` - Analyze single image for pollution
 - `POST /batch-analyze` - Analyze multiple images
+- `POST /calculate-wqi` - Calculate Water Quality Index using Random Forest model
 
-### Response Format
+### WQI Calculation Request
+```json
+{
+  "temp": 25.5,
+  "do": 6.5,
+  "ph": 7.2,
+  "bod": 3.2,
+  "totalColiform": 100
+}
+```
+
+### WQI Calculation Response
+```json
+{
+  "success": true,
+  "wqi": 75.5,
+  "healthScore": 75.5,
+  "status": "good",
+  "classification": 2
+}
+```
+
+### Image Analysis Response
 ```json
 {
   "success": true,
@@ -319,7 +377,16 @@ After running the seed script, you can use these credentials:
 
 ## 🧪 Health Score Calculation
 
-The health score is calculated based on:
+The health score is calculated using two methods:
+
+### 1. AI Module (Random Forest Model)
+- Uses trained Random Forest regression model (`wqi_model.pkl`)
+- Takes 8 parameters: Temperature, DO, pH, Conductivity, BOD, Nitrate, Fecal Coliform, Total Coliform
+- Returns WQI, health score, status, and classification
+- More accurate and data-driven
+
+### 2. Local Calculation (Fallback)
+Used when AI module is unavailable:
 
 - **Dissolved Oxygen (DO)**: Optimal >6 mg/L
 - **pH**: Optimal 6.5-8.5
@@ -327,12 +394,13 @@ The health score is calculated based on:
 - **Fecal Coliform**: Safe <2500 MPN/100mL
 - **Nitrate**: Safe <45 mg/L
 
-**Formula**: Health Score = 100 - Pollution Penalty
+**Formula**: Health Score = 100 - wqi and wqi = sigma(quality_index * weight)
 
 **Categories**:
-- 80-100: Healthy (Green)
-- 50-79: Moderate (Yellow)
-- 0-49: Critical (Red)
+- 80-100: Excellent (Green)
+- 50-79: Good (Blue)
+- 25-49: Poor (Yellow)
+- 0-24: Critical (Red)
 
 ---
 
@@ -353,7 +421,7 @@ Automatic alerts are generated when:
 
 1. **Backend**: Add routes in `backend/routes/`, update models in `backend/models/`
 2. **Frontend**: Add pages in `frontend/src/app/`, components in `frontend/src/components/`
-3. **Database**: Update seed script in `backend/scripts/seed.js`
+3. **Database**: Update seed script in `backend/scripts/:seed.js, seedWQ.js, seedAlert.js`
 
 ### Database Schema
 
@@ -414,7 +482,7 @@ MIT License - See LICENSE file for details
 
 ## 👥 Team
 
-Smart India Hackathon 2024 Team
+Bootcamp Team - QUANTUM CREW
 
 ---
 
