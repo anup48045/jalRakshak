@@ -130,6 +130,8 @@ jalrakshak/
 │   │   └── healthScore.js   # Health score calculation
 │   ├── scripts/             # Database seeding
 │   │   └── seed.js          # Excel-based water body seeding
+│   │   └── seedAlert.js     # Alert seeding based on water quality
+│   │   └── seedWQ.js        # Water Quality seeding based on waterbodies
 │   ├── server.js            # Main server file
 │   └── package.json
 ├── ai-module/               # Python FastAPI AI module
