@@ -85,7 +85,9 @@ export default function LoginPage() {
           </form>
           <div className="mt-6 text-center text-sm text-gray-600">
             <p>Demo Credentials:</p>
-            <p className="text-xs mt-1">admin@delhi.gov.in / admin123</p>
+            <p className="text-xs mt-1">Admin: admin@delhi.gov.in / admin123</p>
+            <p className="text-xs mt-1">Officer: officer@delhi.gov.in / officer123</p>
+            <p className="text-xs mt-1">Citizen: adi4576@gmail.com / citizen123</p>
           </div>
         </CardContent>
       </Card>

@@ -25,8 +25,8 @@ router.get('/', protect, authorize('admin'), async (req, res) => {
 
 // @route   GET /api/users/officers
 // @desc    Get all field officers
-// @access  Private/Admin/Official
-router.get('/officers', protect, authorize('admin', 'official'), async (req, res) => {
+// @access  Private/Admin
+router.get('/officers', protect, authorize('admin'), async (req, res) => {
   try {
     const officers = await User.find({ role: 'officer' }).select('-password');
     res.json({

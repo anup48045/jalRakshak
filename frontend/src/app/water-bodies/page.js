@@ -164,7 +164,7 @@ export default function WaterBodiesPage() {
           {waterBodies.length === 0 ? (
             <p className="text-sm text-gray-500">No water bodies found</p>
           ) : (
-            <div className="space-y-4 h-[500px] overflow-y-auto grid grid-cols-2 gap-4">
+            <div className="h-[500px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
               {waterBodies.map((waterBody) => (
                 <div
                   key={waterBody._id}

@@ -33,8 +33,8 @@ const seedData = async () => {
     // Passwords are stored by the schema pre-save hook, so provide plain text here.
     const adminPassword = 'admin123';
     const officerPassword = 'officer123';
-    const officialPassword = 'official123';
-
+    const citizenPassword = 'citizen123';
+    
     const admin = await User.create({
       name: 'Admin User',
       email: 'admin@delhi.gov.in',
@@ -43,7 +43,7 @@ const seedData = async () => {
       district: 'Central Delhi'
     });
 
-    const officer1 = await User.create({
+    const officer = await User.create({
       name: 'Rajesh Kumar',
       email: 'officer@delhi.gov.in',
       password: officerPassword,
@@ -52,21 +52,13 @@ const seedData = async () => {
       district: 'North Delhi'
     });
 
-    const officer2 = await User.create({
-      name: 'Priya Sharma',
-      email: 'priya@delhi.gov.in',
-      password: officerPassword,
-      role: 'officer',
+    const citizen = await User.create({
+      name: 'Aditya Kumar',
+      email: 'adi4576@gmail.com',
+      password: citizenPassword,
+      role: 'citizen',
       phone: '9876543211',
       district: 'South Delhi'
-    });
-
-    const official = await User.create({
-      name: 'Government Official',
-      email: 'official@delhi.gov.in',
-      password: officialPassword,
-      role: 'official',
-      district: 'Central Delhi'
     });
 
     console.log('Created users');
