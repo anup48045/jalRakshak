@@ -21,7 +21,7 @@ const Navbar = () => {
     <header className="relative bg-blue-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center ml-0">
+          <div className="flex items-center ml-[-100px]">
             <Link href="/" className="flex items-center">
               <img src="/logo.png" alt="" width={180} height={200} />
             </Link>
@@ -35,7 +35,7 @@ const Navbar = () => {
             <Link href="/ai-analysis" className="hover:text-slate-800 font-bold">AI Analysis</Link>
             <Link href="/health-calculator" className="hover:text-slate-800 font-bold">WQI Calculator</Link>
             <Link href="/complaints/new" className="hover:text-slate-800 font-bold">Report Pollution</Link>
-            <Link href="/contact" className="hover:text-slate-800 font-bold">Contact</Link>
+            <Link href="/other-state-data" className="hover:text-slate-800 font-bold">Other State Data</Link>
           </nav>
           {user ?
             <div className="hidden md:flex items-center space-x-3 mr-0">
@@ -101,8 +101,8 @@ const Navbar = () => {
                 <Link href="/complaints/new" className="font-bold hover:text-slate-800">
                   Report Pollution
                 </Link>
-                <Link href="/contact" className="font-bold hover:text-slate-800">
-                  Contact
+                <Link href="/other-state-data" className="font-bold hover:text-slate-800">
+                  Other State Data
                 </Link>
 
                 <hr />
