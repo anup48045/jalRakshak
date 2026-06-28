@@ -21,7 +21,7 @@ const Navbar = () => {
     <header className="relative bg-blue-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center ml-[-100px]">
+          <div className="flex items-center ml-[-50px] lg:ml-[-100px]">
             <Link href="/" className="flex items-center">
               <img src="/logo.png" alt="" width={180} height={200} />
             </Link>
