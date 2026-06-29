@@ -35,9 +35,14 @@ export default function SurveysPage() {
       // if (hasRole(["officer"]) && !hasRole(["admin"])) {
       //   params.append("officerId", user._id);
       // }
-
-      const res = await api.get(`/surveys?officerId=${user.id}`);
-      setSurveys(res.data.surveys || []);
+      if(hasRole(["admin"])){
+        const res = await api.get(`/surveys`);
+        setSurveys(res.data.surveys || []);
+      }
+      else{
+        const res = await api.get(`/surveys?officerId=${user.id}`);
+        setSurveys(res.data.surveys || []);
+      }
     } catch (error) {
       toast.error("Failed to fetch surveys");
     } finally {
