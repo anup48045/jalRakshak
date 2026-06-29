@@ -98,7 +98,7 @@ export default function AlertsPage() {
             {alerts.length === 0 ? (
               <p className="text-sm text-gray-500">No alerts found</p>
             ) : (
-              <div className="space-y-4 h-3xl grid grid-cols-2 gap-2">
+              <div className="h-3xl grid grid-cols-2 gap-2">
                 {alerts.map((alert) => (
                   <div
                     key={alert._id}
