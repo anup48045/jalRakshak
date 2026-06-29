@@ -122,7 +122,7 @@ export default function HealthCalculatorPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Temperature (°C) *
+                    Temperature (°C) 
                   </label>
                   <input
                     type="number"
@@ -173,7 +173,7 @@ export default function HealthCalculatorPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Conductivity (µS/cm) *
+                    Conductivity (µS/cm)
                   </label>
                   <input
                     type="number"
@@ -206,7 +206,7 @@ export default function HealthCalculatorPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nitrate (mg/L) *
+                    Nitrate (mg/L)
                   </label>
                   <input
                     type="number"
@@ -222,7 +222,7 @@ export default function HealthCalculatorPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Fecal Coliform (MPN/100mL) *
+                    Fecal Coliform (MPN/100mL)
                   </label>
                   <input
                     type="number"
