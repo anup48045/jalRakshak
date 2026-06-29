@@ -210,18 +210,6 @@ export default function Contact() {
                       );
                     })}
                   </div>
-
-                  {station.station_diary_status && (
-                    <div className="bg-yellow-50 p-3 rounded text-xs text-yellow-800">
-                      <div className="font-medium mb-1">Status Notes:</div>
-                      <div className="line-clamp-2">
-                        {station.station_diary_status
-                          .split("<br>")
-                          .slice(-2)
-                          .join(" | ")}
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             ))
