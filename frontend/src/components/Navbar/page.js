@@ -1,16 +1,20 @@
 "use client";
+
 import { React, useState } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
-
-
+import { useRouter, usePathname } from 'next/navigation'
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
 
   const handleLogout = () => {
     logout();

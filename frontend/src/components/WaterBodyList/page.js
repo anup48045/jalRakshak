@@ -15,6 +15,7 @@ export default function WaterBodyList({ onWaterBodySelect }) {
       try {
         const res = await api.get("/waterbodies");
         setWaterBodies(res.data.waterBodies);
+        console.log(res.data.waterBodies)
       } catch (error) {
         console.error("Error fetching water bodies:", error);
       } 

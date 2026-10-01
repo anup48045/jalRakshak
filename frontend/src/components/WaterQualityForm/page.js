@@ -195,21 +195,6 @@ export default function WaterQualityForm() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Lab Name (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.labName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, labName: e.target.value })
-                    }
-                    placeholder="e.g., Delhi Water Testing Lab"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
               </div>
 
               {/* Water Quality Parameters */}

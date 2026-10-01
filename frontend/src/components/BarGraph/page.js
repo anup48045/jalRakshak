@@ -96,8 +96,8 @@ export default function BarGraph({ waterBodyId }) {
   const getBarColor = (healthScore) => {
   if (healthScore >= 75) return "#22c55e"; // Green - Excellent
   if (healthScore >= 50) return "#84cc16"; // Lime - Good
-  if (healthScore >= 25) return "#eab308"; // Yellow - Moderate
-  if (healthScore > 0) return "#ef4444"; // red - Poor
+  if (healthScore >= 25) return "yellow"; // Yellow - Moderate
+  if (healthScore > 0) return "red"; // red - Poor
   return "#ef4444"; //Critical
 };
 
@@ -140,7 +140,7 @@ export default function BarGraph({ waterBodyId }) {
           ticks={Array.from({ length: 11 }, (_, i) => i * 10)} 
           label={{ value: 'Health Score', angle: -90, position: 'insideLeft' }} />
           <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="healthScore" radius={[8, 8, 0, 0]} barSize={50}>
+          <Bar dataKey="healthScore" radius={[0, 0, 0, 0]} barSize={50}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getBarColor(entry.healthScore)} />
             ))}

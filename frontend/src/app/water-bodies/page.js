@@ -12,6 +12,7 @@ export default function WaterBodiesPage() {
   const router = useRouter();
   const { user, hasRole } = useAuthStore();
   const [waterBodies, setWaterBodies] = useState([]);
+  const [qualityData, setQualityData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingWaterBody, setEditingWaterBody] = useState(null);
@@ -23,22 +24,53 @@ export default function WaterBodiesPage() {
       return;
     }
     fetchWaterBodies();
-  }, [user, hasRole, router, filter]);
+  }, [user, hasRole, router, filter.district, filter.category]);
 
   const fetchWaterBodies = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (filter.district) params.append('district', filter.district);
       if (filter.category) params.append('category', filter.category);
-      if (filter.status) params.append('status', filter.status);
 
-      const res = await api.get(`/waterbodies?${params.toString()}`);
-      setWaterBodies(res.data.waterBodies || []);
+      const [wbRes, wqRes] = await Promise.allSettled([
+        api.get(`/waterbodies?${params.toString()}`),
+        api.get('/waterquality')
+      ]);
+
+      if (wbRes.status === 'fulfilled') {
+        setWaterBodies(wbRes.value.data.waterBodies || []);
+      }
+      if (wqRes.status === 'fulfilled') {
+        setQualityData(wqRes.value.data.records || []);
+      }
     } catch (error) {
       toast.error("Failed to fetch water bodies");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCurrentQuality = (waterBodyId) => {
+    const currentYear = new Date().getFullYear();
+
+    if (!qualityData?.length) return null;
+
+    const currentQuality = qualityData.find(
+      (q) =>
+        Number(q.year) === currentYear &&
+        String(q.waterBodyId?._id || q.waterBodyId) === String(waterBodyId)
+    );
+
+    if (currentQuality) return currentQuality;
+
+    return (
+      qualityData
+        .filter(
+          (q) => String(q.waterBodyId?._id || q.waterBodyId) === String(waterBodyId)
+        )
+        .sort((a, b) => Number(b.year) - Number(a.year))[0] || null
+    );
   };
 
   const handleDelete = async (id) => {
@@ -70,17 +102,28 @@ export default function WaterBodiesPage() {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "healthy":
+      case "excellent":
         return "bg-green-100 text-green-800";
+      case "good":
+        return "bg-lime-100 text-lime-800";
       case "moderate":
         return "bg-yellow-100 text-yellow-800";
+      case "poor":
       case "critical":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const filteredWaterBodies = waterBodies.filter((wb) => {
+    if (!filter.status) return true;
+    const quality = getCurrentQuality(wb._id);
+    const currentStatus = (quality?.status || wb.status || '').toLowerCase();
+    return currentStatus === filter.status.toLowerCase();
+  });
 
   if (loading) {
     return (
@@ -145,9 +188,12 @@ export default function WaterBodiesPage() {
                 onChange={(e) => setFilter({ ...filter, status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All Status</option>
+                <option value="">All Statuses</option>
+                <option value="excellent">Excellent</option>
+                <option value="good">Good</option>
                 <option value="healthy">Healthy</option>
                 <option value="moderate">Moderate</option>
+                <option value="poor">Poor</option>
                 <option value="critical">Critical</option>
               </select>
             </div>
@@ -158,56 +204,62 @@ export default function WaterBodiesPage() {
       {/* Water Bodies List */}
       <Card>
         <CardHeader>
-          <CardTitle>All Water Bodies ({waterBodies.length})</CardTitle>
+          <CardTitle>All Water Bodies ({filteredWaterBodies.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {waterBodies.length === 0 ? (
+          {filteredWaterBodies.length === 0 ? (
             <p className="text-sm text-gray-500">No water bodies found</p>
           ) : (
             <div className="h-[500px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-              {waterBodies.map((waterBody) => (
-                <div
-                  key={waterBody._id}
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{waterBody.name}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{waterBody.description || "No description"}</p>
-                      <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                        <span>📍 {waterBody.district}</span>
-                        <span>🏷️ {waterBody.category}</span>
-                        <span>📐 {waterBody.area} sqm</span>
-                        <span>💯 Score: {waterBody.healthScore}</span>
-                      </div>
-                    </div>
-                    <span
-                      className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${getStatusColor(
-                        waterBody.status
-                      )}`}
-                    >
-                      {waterBody.status}
-                    </span>
-                  </div>
+              {filteredWaterBodies.map((waterBody) => {
+                const quality = getCurrentQuality(waterBody._id);
+                const healthStatus = quality?.status || waterBody.status || 'No Data';
+                const healthScore = quality?.healthScore ?? waterBody.healthScore ?? 'N/A';
 
-                  <div className="flex gap-2 mt-3">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEdit(waterBody)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(waterBody._id)}
-                    >
-                      Delete
-                    </Button>
+                return (
+                  <div
+                    key={waterBody._id}
+                    className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{waterBody.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{waterBody.description || "No description"}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                          <span>📍 {waterBody.district}</span>
+                          <span>🏷️ {waterBody.category}</span>
+                          <span>📐 {waterBody.area} sqm</span>
+                          <span>💯 Score: {healthScore}</span>
+                        </div>
+                      </div>
+                      <span
+                        className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${getStatusColor(
+                          healthStatus
+                        )}`}
+                      >
+                        {healthStatus}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(waterBody)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(waterBody._id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
