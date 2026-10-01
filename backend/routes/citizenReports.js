@@ -83,8 +83,8 @@ router.post('/', async (req, res) => {
 
 // @route   PUT /api/citizen-reports/:id/verify
 // @desc    Verify citizen report
-// @access  Private/Admin/Official
-router.put('/:id/verify', protect, authorize('admin', 'official'), async (req, res) => {
+// @access  Private/Admin/Official/Officer
+router.put('/:id/verify', protect, authorize('admin', 'official', 'officer'), async (req, res) => {
   try {
     const { status, verificationNotes } = req.body;
 

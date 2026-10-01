@@ -112,6 +112,7 @@ export default function DashboardShell({
         ? [
           { id: 'surveys', label: 'My Surveys', icon: FileText },
           { id: 'new-survey', label: 'New Survey', icon: FileSpreadsheet },
+          { id: 'complaints', label: 'Citizen Reports', icon: MessageSquare },
           { id: 'water-quality-update', label: 'Update Water Quality', icon: Droplets },
           { id: 'alerts', label: 'Alerts & Warnings', icon: AlertTriangle },
           { id: 'reports', label: 'Reports', icon: Activity },

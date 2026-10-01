@@ -16,7 +16,7 @@ export default function ComplaintsPage() {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    if (!user || !hasRole(['admin'])) {
+    if (!user || !hasRole(['admin', 'officer', 'official'])) {
       router.push('/dashboard');
       return;
     }

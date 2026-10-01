@@ -67,7 +67,7 @@ export default function ComplaintsView({ role = 'admin', user, onNewComplaint })
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {role === 'admin' && (
+          {(role === 'admin' || role === 'officer') && (
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -162,7 +162,7 @@ export default function ComplaintsView({ role = 'admin', user, onNewComplaint })
                   )}
                 </div>
 
-                {role === 'admin' && (
+                {(role === 'admin' || role === 'officer') && (
                   <div className="flex gap-2 mt-4 pt-3 border-t border-slate-200/60">
                     {complaint.status !== 'verified' && (
                       <button

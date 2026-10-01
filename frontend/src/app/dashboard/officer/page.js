@@ -15,7 +15,8 @@ import {
   MapPin,
   Sparkles,
   Building2,
-  Clock
+  Clock,
+  MessageSquare
 } from 'lucide-react'
 
 export default function OfficerDashboard() {
@@ -24,6 +25,7 @@ export default function OfficerDashboard() {
   const [stats, setStats] = useState(null)
   const [mySurveys, setMySurveys] = useState([])
   const [recentAlerts, setRecentAlerts] = useState([])
+  const [recentComplaints, setRecentComplaints] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -56,15 +58,22 @@ export default function OfficerDashboard() {
         return { data: { alerts: [] } }
       })
 
-      const [statsRes, surveysRes, alertsRes] = await Promise.all([
+      const complaintsPromise = api.get('/citizen-reports?limit=5').catch(err => {
+        console.error('Complaints API error:', err)
+        return { data: { reports: [] } }
+      })
+
+      const [statsRes, surveysRes, alertsRes, complaintsRes] = await Promise.all([
         statsPromise,
         surveysPromise,
-        alertsPromise
+        alertsPromise,
+        complaintsPromise
       ])
 
       setStats(statsRes?.data?.stats ?? null)
       setMySurveys(surveysRes?.data?.surveys ?? [])
       setRecentAlerts(alertsRes?.data?.alerts ?? [])
+      setRecentComplaints(complaintsRes?.data?.reports ?? [])
     } catch (error) {
       console.error('Dashboard data loading error:', error)
       toast.error(error.response?.data?.message || error.message || 'Failed to load dashboard data')
@@ -89,34 +98,36 @@ export default function OfficerDashboard() {
     )
   }
 
+  const pendingComplaintsCount = recentComplaints.filter(c => c.status === 'pending' || !c.status).length
+
   const statCards = [
     {
-      label: 'Total Standards',
+      label: 'Water Bodies',
       value: stats?.totalWaterBodies ?? 275,
-      subtext: `${stats?.totalWaterBodies ?? 275} active`,
+      subtext: `${stats?.totalWaterBodies ?? 275} monitored`,
       color: 'orange',
       icon: Droplets
     },
     {
-      label: 'Departments',
-      value: mySurveys.length > 0 ? mySurveys.length : 17,
-      subtext: '23 sections',
+      label: 'My Surveys',
+      value: mySurveys.length > 0 ? mySurveys.length : (stats?.surveysCompleted ?? 0),
+      subtext: 'Inspections logged',
       color: 'blue',
-      icon: Building2
+      icon: FileText
     },
     {
-      label: 'Total Imports',
-      value: mySurveys.length > 0 ? mySurveys.length : 3,
-      subtext: '3 successful',
+      label: 'Citizen Reports',
+      value: stats?.citizenReports ?? recentComplaints.length,
+      subtext: `${pendingComplaintsCount} pending review`,
       color: 'green',
-      icon: Clock
+      icon: MessageSquare
     },
     {
-      label: 'Failed Imports',
+      label: 'Active Alerts',
       value: stats?.activeAlerts ?? 0,
-      subtext: stats?.activeAlerts > 0 ? `${stats.activeAlerts} need attention` : 'Needs attention',
+      subtext: stats?.activeAlerts > 0 ? `${stats.activeAlerts} need attention` : 'Parameters normal',
       color: 'purple',
-      icon: Activity
+      icon: AlertTriangle
     }
   ]
 
@@ -134,7 +145,7 @@ export default function OfficerDashboard() {
         id: alert._id,
         title: alert.waterBodyName || 'Water Body Alert',
         subtitle: Array.isArray(alert.message) ? alert.message.join(', ') : alert.message || 'Water parameter exceeded',
-        icon: FileSpreadsheet,
+        icon: AlertTriangle,
         statusBadge: (
           <span
             className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
@@ -149,23 +160,31 @@ export default function OfficerDashboard() {
           </span>
         )
       }))
-    : [
-        {
-          id: '1',
-          title: 'File_Published_Standards_List_2026-08-29_194259.xlsx',
-          subtitle: 'CED · 65 rows'
-        },
-        {
-          id: '2',
-          title: 'File_Published_Standards_List_2026-08-28_190748.xlsx',
-          subtitle: 'CED · 174 rows'
-        },
-        {
-          id: '3',
-          title: 'File_Published_Standards_List_2026-08-28_190748.xlsx',
-          subtitle: 'CED · 174 rows'
-        }
-      ]
+    : []
+
+  const recentComplaintItems = recentComplaints.length > 0
+    ? recentComplaints.slice(0, 3).map((complaint) => ({
+        id: complaint._id,
+        title: complaint.title || 'Citizen Complaint',
+        subtitle: `${complaint.locationName || complaint.location || 'Delhi'} · ${new Date(complaint.createdAt).toLocaleDateString()}`,
+        icon: MessageSquare,
+        statusBadge: (
+          <span
+            className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+              complaint.status === 'resolved'
+                ? 'bg-emerald-100 text-emerald-700'
+                : complaint.status === 'in-progress'
+                ? 'bg-amber-100 text-amber-700'
+                : complaint.status === 'verified'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-slate-100 text-slate-700'
+            }`}
+          >
+            {complaint.status || 'pending'}
+          </span>
+        )
+      }))
+    : []
 
   const quickActions = [
     {
@@ -179,6 +198,12 @@ export default function OfficerDashboard() {
       description: 'View and manage your recorded surveys and submissions',
       icon: FileText,
       tabId: 'surveys'
+    },
+    {
+      title: 'Citizen Reports',
+      description: 'View and track complaints & pollution reports from citizens',
+      icon: MessageSquare,
+      tabId: 'complaints'
     },
     {
       title: 'Update Water Quality',
@@ -243,59 +268,8 @@ export default function OfficerDashboard() {
           </div>
         )}
       </div>
-
-      {/* Recent Alerts Card */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-slate-900 text-base tracking-tight">
-            Active Quality Alerts
-          </h3>
-        </div>
-
-        {recentAlerts.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3">No active quality alerts</p>
-        ) : (
-          <div className="space-y-3">
-            {recentAlerts.map((alert) => (
-              <div
-                key={alert._id}
-                className="flex items-center justify-between p-3.5 bg-slate-50/70 hover:bg-slate-100/70 border border-slate-100/90 rounded-xl transition-all"
-              >
-                <div className="min-w-0 pr-4">
-                  <p className="font-semibold text-xs md:text-sm text-slate-800">
-                    {alert.waterBodyName}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">
-                    {Array.isArray(alert.message) ? alert.message.join(', ') : alert.message}
-                  </p>
-                </div>
-                <span
-                  className={`shrink-0 px-2.5 py-1 text-[11px] font-bold rounded-full uppercase tracking-wider ${
-                    alert.severity === 'critical'
-                      ? 'bg-red-100 text-red-700'
-                      : alert.severity === 'high'
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
-                >
-                  {alert.severity}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   )
-
-  const recentSurveyItems = mySurveys.length > 0
-    ? mySurveys.slice(0, 3).map((survey) => ({
-      id: survey._id,
-      title: survey.waterBodyId?.name || 'Water Body Survey',
-      subtitle: `${survey.remarks ? survey.remarks.substring(0, 45) + '...' : 'Routine inspection'} · ${new Date(survey.createdAt).toLocaleDateString()}`,
-      icon: FileText
-    }))
-    : []
 
   return (
     <DashboardShell
@@ -308,11 +282,11 @@ export default function OfficerDashboard() {
       recentItemsTitle="Active Quality Alerts"
       recentItems={recentAlertItems}
       recentItemsBadge="Live data"
-      secondaryRecentTitle="My Recent Surveys"
-      secondaryRecentItems={recentSurveyItems}
+      secondaryRecentTitle="Recent Citizen Complaints"
+      secondaryRecentItems={recentComplaintItems}
       secondaryRecentBadge="Live data"
       quickActions={quickActions}
-      bottomContent={null}
+      bottomContent={bottomSection}
       onLogout={handleLogout}
     />
   )
